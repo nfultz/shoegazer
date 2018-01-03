@@ -153,7 +153,7 @@
       return(as.vector(object.name[,1]))
     }
     if (model.name %in% c("selection", "heckit")) {
-      if (!.global.sel.equation) {
+      if (!gbl$sel.equation) {
         indices <- .summary.object$param$index$betaO                  ### outcome equation
       }
       else {
@@ -181,7 +181,7 @@
       return(.summary.object$coefficients[,1])
     }
     if (model.name %in% c("clm")) {
-      if (.format.ordered.intercepts == FALSE) {
+      if (fmt$ordered.intercepts == FALSE) {
         return(.summary.object$coefficients[(length(object.name$alpha)+1):(length(object.name$coefficients)),1])
       }
       else {
@@ -192,7 +192,7 @@
       return(.summary.object$coefficients)
     }
     else if (model.name %in% c("zeroinfl", "hurdle")) {
-      if (.global.zero.component==FALSE) {
+      if (gbl$zero.component==FALSE) {
         return(.summary.object$coefficients$count[,"Estimate"])  
       }
       else {
@@ -216,7 +216,7 @@
     }
     else if (model.name %in% c("ologit", "oprobit", "polr()")) {
       coef.temp <- suppressMessages(.summary.object$coefficients[,"Value"])
-      if (.format.ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
+      if (fmt$ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
       else { return(coef.temp) }
     }
     else if (model.name %in% c("arima", "rem.dyad")) {
@@ -746,7 +746,7 @@
       return(as.vector(.summary.object$coefficients$mean[,4]))
     }
     if (model.name %in% c("selection","heckit")) {
-      if (!.global.sel.equation) {
+      if (!gbl$sel.equation) {
         indices <- .summary.object$param$index$betaO                  ### outcome equation
       }
       else {
@@ -780,7 +780,7 @@
       return(.summary.object$coefs[,4])
     }
     if (model.name %in% c("clm")) {
-      if (.format.ordered.intercepts == FALSE) {
+      if (fmt$ordered.intercepts == FALSE) {
         return(.summary.object$coefficients[(length(object.name$alpha)+1):(length(object.name$coefficients)),4])
       }
       else {
@@ -795,7 +795,7 @@
       return( 2 * pt(abs(t.stat.temp), df=df.temp, lower.tail = FALSE, log.p = FALSE) )
     }
     else if (model.name %in% c("zeroinfl", "hurdle")) {
-      if (.global.zero.component==FALSE) {
+      if (gbl$zero.component==FALSE) {
         return(.summary.object$coefficients$count[,4])  
       }
       else {
@@ -822,7 +822,7 @@
     }
     else if (model.name %in% c("ologit", "oprobit", "polr()")) {
       coef.temp <- suppressMessages(.summary.object$coefficients[,"t value"])
-      if (.format.ordered.intercepts == FALSE) { return(2*pnorm(abs(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(.summary.object$lev))-1))]), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE)) }
+      if (fmt$ordered.intercepts == FALSE) { return(2*pnorm(abs(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(.summary.object$lev))-1))]), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE)) }
       else { 
         return( 2*pnorm(abs(coef.temp[seq(from=1, to=length(coef.temp))]), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) ) 
       }
@@ -1019,7 +1019,7 @@
       return(as.vector(object.name[,2]))
     }
     if (model.name %in% c("selection","heckit")) {
-      if (!.global.sel.equation) {
+      if (!gbl$sel.equation) {
         indices <- .summary.object$param$index$betaO                  ### outcome equation
       }
       else {
@@ -1050,7 +1050,7 @@
       return(.summary.object$coefficients[,2])
     }
     if (model.name %in% c("clm")) {
-      if (.format.ordered.intercepts == FALSE) {
+      if (fmt$ordered.intercepts == FALSE) {
         return(.summary.object$coefficients[(length(object.name$alpha)+1):(length(object.name$coefficients)),2])
       }
       else {
@@ -1061,7 +1061,7 @@
       return (sqrt(diag(.summary.object$vcov)))
     }
     if (model.name %in% c("zeroinfl", "hurdle")) {
-      if (.global.zero.component == FALSE) {
+      if (gbl$zero.component == FALSE) {
         return(.summary.object$coefficients$count[,"Std. Error"])  
       }
       else {
@@ -1091,7 +1091,7 @@
     }
     else if (model.name %in% c("ologit", "oprobit", "polr()")) {
       se.temp <- suppressMessages(.summary.object$coefficients[,"Std. Error"])
-      if (.format.ordered.intercepts == FALSE) { return(se.temp[seq(from=1, to=length(se.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
+      if (fmt$ordered.intercepts == FALSE) { return(se.temp[seq(from=1, to=length(se.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
       else { return(se.temp) }
     }
     else if (model.name %in% c("arima")) {
@@ -1303,7 +1303,7 @@
       return(as.vector(.summary.object$CoefTable[,3]))
     }
     if (model.name %in% c("selection","heckit")) {
-      if (!.global.sel.equation) {
+      if (!gbl$sel.equation) {
         indices <- .summary.object$param$index$betaO                  ### outcome equation
       }
       else {
@@ -1336,7 +1336,7 @@
       return(.summary.object$coefficients[,3])
     }
     if (model.name %in% c("clm")) {
-      if (.format.ordered.intercepts == FALSE) {
+      if (fmt$ordered.intercepts == FALSE) {
         return(.summary.object$coefficients[(length(object.name$alpha)+1):(length(object.name$coefficients)),3])
       }
       else {
@@ -1350,7 +1350,7 @@
       return(t.stat.temp)
     }
     else if (model.name %in% c("zeroinfl", "hurdle")) {
-      if (.global.zero.component == FALSE) {
+      if (gbl$zero.component == FALSE) {
         return(.summary.object$coefficients$count[,3])  
       }
       else {
@@ -1375,7 +1375,7 @@
     }
     else if (model.name %in% c("ologit", "oprobit", "polr()")) {
       tstat.temp <- suppressMessages(.summary.object$coefficients[,"t value"])
-      if (.format.ordered.intercepts == FALSE) { return(tstat.temp[seq(from=1, to=length(tstat.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
+      if (fmt$ordered.intercepts == FALSE) { return(tstat.temp[seq(from=1, to=length(tstat.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
       else { return(tstat.temp) }
     }
     else if (model.name %in% c("arima")) {
@@ -1512,24 +1512,24 @@
     if (part=="variable name") {
       
       # use intercept name for intercept, otherwise variable name
-      if (is.na(.format.covariate.labels[.which.variable.label])) {
-        if (.format.coefficient.variables.capitalize == TRUE) { cat(" ", .format.coefficient.variables.left, toupper(variable.name), .format.coefficient.variables.right, sep="") }
-        else { cat(" ", .format.coefficient.variables.left, variable.name, .format.coefficient.variables.right, sep="") }
+      if (is.na(fmt$covariate.labels[.which.variable.label])) {
+        if (fmt$coefficient.variables.capitalize == TRUE) { cat(" ", fmt$coefficient.variables.left, toupper(variable.name), fmt$coefficient.variables.right, sep="") }
+        else { cat(" ", fmt$coefficient.variables.left, variable.name, fmt$coefficient.variables.right, sep="") }
       }
-      else { cat(" ", .format.coefficient.variables.left, .format.covariate.labels[.which.variable.label], .format.coefficient.variables.right, sep="") }
+      else { cat(" ", fmt$coefficient.variables.left, fmt$covariate.labels[.which.variable.label], fmt$coefficient.variables.right, sep="") }
     }
     
     # coefficients and stars
     else if ((part=="coefficient") | (part=="coefficient*")) {
-      for (i in seq(1:length(.global.models))) {
-        if (!is.na(.global.coefficients[.global.coefficient.variables[which.variable],i])) {
+      for (i in seq(1:length(gbl$models))) {
+        if (!is.na(gbl$coefficients[gbl$coefficient.variables[which.variable],i])) {
           
           # report the coefficient
-          cat(" & ", .iround(.global.coefficients[.global.coefficient.variables[which.variable],i],.format.round.digits),sep="")
+          cat(" & ", .iround(gbl$coefficients[gbl$coefficient.variables[which.variable],i],fmt$round.digits),sep="")
           
           # add stars to denote statistical significance
           if (part=="coefficient*") { 
-            p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
+            p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
             .enter.significance.stars(p.value) 
           }
           
@@ -1539,47 +1539,47 @@
         }
         
         # if single-row, follow up with standard error / confidence interval
-        if ((.format.single.row == TRUE) & (("standard error" %in% .format.coefficient.table.parts) | ("standard error*" %in% .format.coefficient.table.parts))) {
+        if ((fmt$single.row == TRUE) & (("standard error" %in% fmt$coefficient.table.parts) | ("standard error*" %in% fmt$coefficient.table.parts))) {
           
-          if (.format.dec.mark.align == TRUE) { space.char <- "$ $"}
+          if (fmt$dec.mark.align == TRUE) { space.char <- "$ $"}
           else { space.char <- " "}
           
-          if (!is.na(.global.std.errors[.global.coefficient.variables[which.variable],i])) {
+          if (!is.na(gbl$std.errors[gbl$coefficient.variables[which.variable],i])) {
             
             # report standard errors or confidence intervals
             
-            .format.ci.use <- .format.ci[i]
-            if (is.na(.format.ci.use)) {
+            fmt$ci.use <- fmt$ci[i]
+            if (is.na(fmt$ci.use)) {
               for (j in i:1) {
-                if (!is.na(.format.ci[j])) {
-                  .format.ci.use <- .format.ci[j]
+                if (!is.na(fmt$ci[j])) {
+                  fmt$ci.use <- fmt$ci[j]
                   break
                 }
               }
             }
             
-            if (.format.ci.use == TRUE) {
+            if (fmt$ci.use == TRUE) {
               
               # if ci level is NA, find the most recent set level
-              .format.ci.level.use <- .format.ci.level[i]
-              if (is.na(.format.ci.level.use)) {
+              fmt$ci.level.use <- fmt$ci.level[i]
+              if (is.na(fmt$ci.level.use)) {
                 for (j in i:1) {
-                  if (!is.na(.format.ci.level[j])) {
-                    .format.ci.level.use <- .format.ci.level[j]
+                  if (!is.na(fmt$ci.level[j])) {
+                    fmt$ci.level.use <- fmt$ci.level[j]
                     break
                   }
                 }
               }
               
-              z.value <- qnorm((1 + .format.ci.level.use)/2)
-              coef <- .global.coefficients[.global.coefficient.variables[which.variable],i]
-              se <- .global.std.errors[.global.coefficient.variables[which.variable],i]
+              z.value <- qnorm((1 + fmt$ci.level.use)/2)
+              coef <- gbl$coefficients[gbl$coefficient.variables[which.variable],i]
+              se <- gbl$std.errors[gbl$coefficient.variables[which.variable],i]
               ci.lower.bound <- coef - z.value * se
               ci.upper.bound <- coef + z.value * se
               
               if (!is.null(ci.custom[[i]])) {
-                ci.lower.bound.temp <- .global.ci.lb[.global.coefficient.variables[which.variable],i]
-                ci.upper.bound.temp <- .global.ci.rb[.global.coefficient.variables[which.variable],i]
+                ci.lower.bound.temp <- gbl$ci.lb[gbl$coefficient.variables[which.variable],i]
+                ci.upper.bound.temp <- gbl$ci.rb[gbl$coefficient.variables[which.variable],i]
                 if (!is.na(ci.lower.bound.temp)) (ci.lower.bound <- ci.lower.bound.temp)
                 if (!is.na(ci.upper.bound.temp)) (ci.upper.bound <- ci.upper.bound.temp)
               }
@@ -1589,23 +1589,23 @@
                 ci.upper.bound <- do.call(apply.ci, list(ci.upper.bound))
               }
               
-              if (.format.dec.mark.align == TRUE) {
-                hyphen <- paste("$",.format.ci.separator,"$", sep="")
+              if (fmt$dec.mark.align == TRUE) {
+                hyphen <- paste("$",fmt$ci.separator,"$", sep="")
               }
               else {
-                hyphen <- .format.ci.separator
+                hyphen <- fmt$ci.separator
               }
               
-              cat(space.char, .format.std.errors.left, .iround(ci.lower.bound,.format.round.digits),hyphen,.iround(ci.upper.bound,.format.round.digits),.format.std.errors.right,sep="")              
+              cat(space.char, fmt$std.errors.left, .iround(ci.lower.bound,fmt$round.digits),hyphen,.iround(ci.upper.bound,fmt$round.digits),fmt$std.errors.right,sep="")              
               
             }
             else { 
-              cat(space.char, .format.std.errors.left, .iround(.global.std.errors[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.std.errors.right,sep="")
+              cat(space.char, fmt$std.errors.left, .iround(gbl$std.errors[gbl$coefficient.variables[which.variable],i],fmt$round.digits),fmt$std.errors.right,sep="")
             }
             
             # add stars to denote statistical significance
-            if ("standard error*" %in% .format.coefficient.table.parts) { 
-              p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
+            if ("standard error*" %in% fmt$coefficient.table.parts) { 
+              p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
               .enter.significance.stars(p.value) 
             }
             
@@ -1616,42 +1616,42 @@
     }
     
     # standard errors
-    else if (((part=="standard error") | (part=="standard error*")) & (.format.single.row==FALSE)) {
-      for (i in seq(1:length(.global.models))) {
-        if (!is.na(.global.std.errors[.global.coefficient.variables[which.variable],i])) {
+    else if (((part=="standard error") | (part=="standard error*")) & (fmt$single.row==FALSE)) {
+      for (i in seq(1:length(gbl$models))) {
+        if (!is.na(gbl$std.errors[gbl$coefficient.variables[which.variable],i])) {
           
           # report standard errors or confidence intervals
-          .format.ci.use <- .format.ci[i]
-          if (is.na(.format.ci.use)) {
+          fmt$ci.use <- fmt$ci[i]
+          if (is.na(fmt$ci.use)) {
             for (j in i:1) {
-              if (!is.na(.format.ci[j])) {
-                .format.ci.use <- .format.ci[j]
+              if (!is.na(fmt$ci[j])) {
+                fmt$ci.use <- fmt$ci[j]
                 break
               }
             }
           }
           
-          if (.format.ci.use == TRUE) {
+          if (fmt$ci.use == TRUE) {
             # if ci level is NA, find the most recent set level
-            .format.ci.level.use <- .format.ci.level[i]
-            if (is.na(.format.ci.level.use)) {
+            fmt$ci.level.use <- fmt$ci.level[i]
+            if (is.na(fmt$ci.level.use)) {
               for (j in i:1) {
-                if (!is.na(.format.ci.level[j])) {
-                  .format.ci.level.use <- .format.ci.level[j]
+                if (!is.na(fmt$ci.level[j])) {
+                  fmt$ci.level.use <- fmt$ci.level[j]
                   break
                 }
               }
             }
             
-            z.value <- qnorm((1 + .format.ci.level.use)/2)
-            coef <- .global.coefficients[.global.coefficient.variables[which.variable],i]
-            se <- .global.std.errors[.global.coefficient.variables[which.variable],i]
+            z.value <- qnorm((1 + fmt$ci.level.use)/2)
+            coef <- gbl$coefficients[gbl$coefficient.variables[which.variable],i]
+            se <- gbl$std.errors[gbl$coefficient.variables[which.variable],i]
             ci.lower.bound <- coef - z.value * se
             ci.upper.bound <- coef + z.value * se
             
             if (!is.null(ci.custom[[i]])) {
-              ci.lower.bound.temp <- .global.ci.lb[.global.coefficient.variables[which.variable],i]
-              ci.upper.bound.temp <- .global.ci.rb[.global.coefficient.variables[which.variable],i]
+              ci.lower.bound.temp <- gbl$ci.lb[gbl$coefficient.variables[which.variable],i]
+              ci.upper.bound.temp <- gbl$ci.rb[gbl$coefficient.variables[which.variable],i]
               if (!is.na(ci.lower.bound.temp)) (ci.lower.bound <- ci.lower.bound.temp)
               if (!is.na(ci.upper.bound.temp)) (ci.upper.bound <- ci.upper.bound.temp)
             }
@@ -1661,29 +1661,29 @@
               ci.upper.bound <- do.call(apply.ci, list(ci.upper.bound))
             }
             
-            if (.format.dec.mark.align == TRUE) {
-              hyphen <- paste("$",.format.ci.separator,"$", sep="")
+            if (fmt$dec.mark.align == TRUE) {
+              hyphen <- paste("$",fmt$ci.separator,"$", sep="")
             }
             else {
-              hyphen <- .format.ci.separator
+              hyphen <- fmt$ci.separator
             }
             
-            if (.format.dec.mark.align == TRUE) {
-              cat(" & \\multicolumn{1}{c}{", .format.std.errors.left, .iround(ci.lower.bound,.format.round.digits),hyphen,.iround(ci.upper.bound,.format.round.digits),.format.std.errors.right,"}",sep="")
+            if (fmt$dec.mark.align == TRUE) {
+              cat(" & \\multicolumn{1}{c}{", fmt$std.errors.left, .iround(ci.lower.bound,fmt$round.digits),hyphen,.iround(ci.upper.bound,fmt$round.digits),fmt$std.errors.right,"}",sep="")
             }
             else {
-              cat(" & ", .format.std.errors.left, .iround(ci.lower.bound,.format.round.digits),hyphen,.iround(ci.upper.bound,.format.round.digits),.format.std.errors.right,sep="")              
+              cat(" & ", fmt$std.errors.left, .iround(ci.lower.bound,fmt$round.digits),hyphen,.iround(ci.upper.bound,fmt$round.digits),fmt$std.errors.right,sep="")              
             }
             
             
           }
           else { 
-            cat(" & ", .format.std.errors.left, .iround(.global.std.errors[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.std.errors.right,sep="")
+            cat(" & ", fmt$std.errors.left, .iround(gbl$std.errors[gbl$coefficient.variables[which.variable],i],fmt$round.digits),fmt$std.errors.right,sep="")
           }
           
           # add stars to denote statistical significance
           if (part=="standard error*") { 
-            p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
+            p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
             .enter.significance.stars(p.value) 
           }
           
@@ -1698,15 +1698,15 @@
     
     # p-values
     else if ((part=="p-value") | (part=="p-value*")) {
-      for (i in seq(1:length(.global.models))) {
-        if (!is.na(.global.p.values[.global.coefficient.variables[which.variable],i])) {
+      for (i in seq(1:length(gbl$models))) {
+        if (!is.na(gbl$p.values[gbl$coefficient.variables[which.variable],i])) {
           
           # report p-values
-          cat(" & ", .format.p.values.left, .iround(.global.p.values[.global.coefficient.variables[which.variable],i],.format.round.digits,round.up.positive=TRUE),.format.p.values.right,sep="")
+          cat(" & ", fmt$p.values.left, .iround(gbl$p.values[gbl$coefficient.variables[which.variable],i],fmt$round.digits,round.up.positive=TRUE),fmt$p.values.right,sep="")
           
           # add stars to denote statistical significance
           if (part=="p-value*") { 
-            p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
+            p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
             .enter.significance.stars(p.value) 
           }
           
@@ -1720,14 +1720,14 @@
     
     # t-statistics
     else if ((part=="t-stat") | (part=="t-stat*")) {
-      for (i in seq(1:length(.global.models))) {
-        if (!is.na(.global.t.stats[.global.coefficient.variables[which.variable],i])) {
+      for (i in seq(1:length(gbl$models))) {
+        if (!is.na(gbl$t.stats[gbl$coefficient.variables[which.variable],i])) {
           # report t-statistics
-          cat(" & ", .format.t.stats.left, .iround(.global.t.stats[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.t.stats.right,sep="")
+          cat(" & ", fmt$t.stats.left, .iround(gbl$t.stats[gbl$coefficient.variables[which.variable],i],fmt$round.digits),fmt$t.stats.right,sep="")
           
           # add stars to denote statistical significance
           if (part=="t-stat*") { 
-            p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
+            p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
             .enter.significance.stars(p.value) 
           }
           
@@ -1801,7 +1801,7 @@
       return(as.vector(names(object.name$coefficients$mean)))
     }
     else if (model.name %in% c("selection","heckit")) {
-      if (!.global.sel.equation) {
+      if (!gbl$sel.equation) {
         indices <- .summary.object$param$index$betaO                  ### outcome equation
       }
       else {
@@ -1816,7 +1816,7 @@
       return(as.vector(rownames(object.name)))
     }
     else if (model.name %in% c("clm")) {
-      if (.format.ordered.intercepts == FALSE) { return(as.vector(names(object.name$beta))) }
+      if (fmt$ordered.intercepts == FALSE) { return(as.vector(names(object.name$beta))) }
       else { return(c(as.vector(names(object.name$beta)), as.vector(names(object.name$alpha)))) }
     }
     else if (model.name %in% c("lmer", "glmer", "nlmer", "pgmm")) {
@@ -1829,7 +1829,7 @@
       return(as.vector(names(object.name$coefficients$mean)))
     }
     else if (model.name %in% c("zeroinfl", "hurdle")) {
-      if (.global.zero.component==FALSE) {
+      if (gbl$zero.component==FALSE) {
         return(as.vector(names(object.name$coefficients$count)))
       }
       else {
@@ -1844,7 +1844,7 @@
     }
     else if (model.name %in% c("ologit", "oprobit", "polr()")) {
       coef.temp <- as.vector(rownames(suppressMessages(.summary.object$coefficients)))
-      if (.format.ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
+      if (fmt$ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
       else { return(coef.temp) }
     }
     else if (model.name %in% c("arima")) {
@@ -1888,7 +1888,7 @@
       return( trimws(substr(formula, 1, position-1)) )
     }
     if (model.name %in% c("selection","heckit")) {
-      if (!.global.sel.equation) {
+      if (!gbl$sel.equation) {
         formula <- object.name$call["outcome"]    ### outcome
       }
       else {
@@ -1981,7 +1981,7 @@
   function(p.value, force.math=FALSE) {
     if ((!is.na(p.value)) & (!is.null(p.value))) {
       
-      if (.format.dec.mark.align == TRUE) {
+      if (fmt$dec.mark.align == TRUE) {
         c <- "" 
       }
       else {
@@ -1989,8 +1989,8 @@
       }
       if (force.math == TRUE) { c <- "$" }
       
-      cutoffs <- .format.cutoffs[length(.format.cutoffs):1]
-      stars <- .format.stars[length(.format.stars):1]
+      cutoffs <- fmt$cutoffs[length(fmt$cutoffs):1]
+      stars <- fmt$stars[length(fmt$stars):1]
       
       for (i in 1:length(cutoffs)) {
         if (!is.na(cutoffs[i])) {

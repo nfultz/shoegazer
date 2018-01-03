@@ -7,8 +7,8 @@
     header.tex <- "\\documentclass{article}\n"
     
     required.latex.packages <- NULL
-    if (.format.dec.mark.align==TRUE) { required.latex.packages <- c(required.latex.packages, "dcolumn") }
-    if (.format.floating.environment=="sidewaystable") { required.latex.packages <- c(required.latex.packages, "rotating") }
+    if (fmt$dec.mark.align==TRUE) { required.latex.packages <- c(required.latex.packages, "dcolumn") }
+    if (fmt$floating.environment=="sidewaystable") { required.latex.packages <- c(required.latex.packages, "rotating") }
     
     if (!is.null(required.latex.packages)) {
       for (i in 1:length(required.latex.packages)) {

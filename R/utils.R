@@ -72,13 +72,13 @@
     
     if (!is.na(decimal.places)) {
       
-      if ((.format.until.nonzero.digit == FALSE) | (decimal.places <= 0)) {
+      if ((fmt$until.nonzero.digit == FALSE) | (decimal.places <= 0)) {
         round.result <- round(x, digits=decimal.places)
       }
       else {
         temp.places <- decimal.places
         if (!.is.all.integers(x)) {
-          while ((round(x, digits=temp.places) == 0) & (temp.places < (decimal.places + .format.max.extra.digits))) {
+          while ((round(x, digits=temp.places) == 0) & (temp.places < (decimal.places + fmt$max.extra.digits))) {
             temp.places <- temp.places + 1
           }
         }
@@ -102,9 +102,9 @@
     
     ## first deal with digit separator
     
-    for (i in seq(from=1, to=length(.format.digit.separator.where))) {
-      if (.format.digit.separator.where[i]<=0) {
-        .format.digit.separator.where[i] <<- -1
+    for (i in seq(from=1, to=length(fmt$digit.separator.where))) {
+      if (fmt$digit.separator.where[i]<=0) {
+        fmt$digit.separator.where[i] <<- -1
       }
     }
     
@@ -113,9 +113,9 @@
     
     digits.in.separated.unit <- 0
     for (i in seq(from=length.integer.part, to=1)) {
-      if ((digits.in.separated.unit == .format.digit.separator.where[separator.count]) & (substr(split.round.result[1],i,i)!="-")){
-        first.part <- paste(.format.digit.separator,first.part,sep="")
-        if (separator.count < length(.format.digit.separator.where)) { separator.count <- separator.count + 1 }
+      if ((digits.in.separated.unit == fmt$digit.separator.where[separator.count]) & (substr(split.round.result[1],i,i)!="-")){
+        first.part <- paste(fmt$digit.separator,first.part,sep="")
+        if (separator.count < length(fmt$digit.separator.where)) { separator.count <- separator.count + 1 }
         digits.in.separated.unit <- 0	
       }
       first.part <- paste(substr(split.round.result[1],i,i),first.part,sep="")
@@ -124,7 +124,7 @@
     }	
     
     # remove initial zero and there are decimal places, if that is requested
-    if (.format.initial.zero==FALSE)  {
+    if (fmt$initial.zero==FALSE)  {
       if ((round.result > 0) & (round.result < 1)) {
         if ((is.na(decimal.places)) | (decimal.places > 0)) {
           first.part <- ""
@@ -133,7 +133,7 @@
     }
     
     if (x.original < 0) {    # use math-mode for a better looking negative sign
-      if (.format.dec.mark.align == TRUE) {
+      if (fmt$dec.mark.align == TRUE) {
         first.part <- paste("-", first.part, sep="")
       }
       else {
@@ -151,23 +151,23 @@
     
     
     if (length(split.round.result)==2) {
-      if (is.na(decimal.places)) { return(paste(first.part,.format.decimal.character,split.round.result[2],sep="")) }
+      if (is.na(decimal.places)) { return(paste(first.part,fmt$decimal.character,split.round.result[2],sep="")) }
       if (nchar(split.round.result[2]) < decimal.places) {
         decimal.part <- split.round.result[2]
         for (i in seq(from = 1,to = (decimal.places - nchar(split.round.result[2])))) {
           decimal.part <- paste(decimal.part,"0", sep="")
         }
-        return(paste(first.part,.format.decimal.character,decimal.part,sep=""))
+        return(paste(first.part,fmt$decimal.character,decimal.part,sep=""))
       }
-      else { return(paste(first.part,.format.decimal.character,split.round.result[2],sep="")) }
+      else { return(paste(first.part,fmt$decimal.character,split.round.result[2],sep="")) }
     }
     else if (length(split.round.result)==1) { 
-      if (is.na(decimal.places)) { return(paste(first.part,.format.decimal.character,decimal.part,sep="")) }
+      if (is.na(decimal.places)) { return(paste(first.part,fmt$decimal.character,decimal.part,sep="")) }
       decimal.part <- ""
       for (i in seq(from = 1,to = decimal.places)) {
         decimal.part <- paste(decimal.part,"0", sep="")
       }
-      return(paste(first.part,.format.decimal.character,decimal.part,sep=""))
+      return(paste(first.part,fmt$decimal.character,decimal.part,sep=""))
     }
     else { return(NULL) }
   }
@@ -311,16 +311,16 @@ is.wholenumber <-
   function(auto.t, auto.p)
   {
     if ((!is.null(apply.coef)) | ((!is.null(apply.se)))) {
-      if (!is.null(apply.coef)) { .global.coefficients <<- apply(.global.coefficients, c(1,2), apply.coef) }
-      if (!is.null(apply.se)) { .global.std.errors <<- apply(.global.std.errors, c(1,2), apply.se) }
+      if (!is.null(apply.coef)) { gbl$coefficients <<- apply(gbl$coefficients, c(1,2), apply.coef) }
+      if (!is.null(apply.se)) { gbl$std.errors <<- apply(gbl$std.errors, c(1,2), apply.se) }
       
-      if (auto.t == TRUE) { .global.t.stats <<- .global.coefficients / .global.std.errors }
-      if (auto.p == TRUE) { .global.p.values <<- 2 * pnorm( abs( .global.t.stats ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) }
+      if (auto.t == TRUE) { gbl$t.stats <<- gbl$coefficients / gbl$std.errors }
+      if (auto.p == TRUE) { gbl$p.values <<- 2 * pnorm( abs( gbl$t.stats ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) }
       
     }
     
-    if (!is.null(apply.t)) { .global.t.stats <<- apply(.global.t.stats, c(1,2), apply.t) }
-    if (!is.null(apply.p)) { .global.p.values <<- apply(.global.p.values, c(1,2), apply.p) }
+    if (!is.null(apply.t)) { gbl$t.stats <<- apply(gbl$t.stats, c(1,2), apply.t) }
+    if (!is.null(apply.p)) { gbl$p.values <<- apply(gbl$p.values, c(1,2), apply.p) }
   }
 
 .inside.bracket <-
@@ -355,8 +355,8 @@ is.wholenumber <-
   function(x) {
     out <- x
     for (i in seq(1:length(x))) {
-      if (x[i] %in% .global.intercept.strings) { 
-        out[i] <- .format.intercept.name
+      if (x[i] %in% gbl$intercept.strings) { 
+        out[i] <- fmt$intercept.name
       }
     }
     return(out)
@@ -367,47 +367,47 @@ is.wholenumber <-
     
     # first, find the position of the intercept and rename the variable to be the intercept string
     intercept.position <- NULL
-    for (i in seq(1:length(.global.coefficient.variables))) {
-      if (.global.coefficient.variables[i] %in% .global.intercept.strings) { 
+    for (i in seq(1:length(gbl$coefficient.variables))) {
+      if (gbl$coefficient.variables[i] %in% gbl$intercept.strings) { 
         intercept.position <- i 
         
-        .global.coefficient.variables[i] <<- .format.intercept.name   
-        rownames(.global.coefficients)[i] <<- .format.intercept.name
-        rownames(.global.std.errors)[i] <<- .format.intercept.name
-        rownames(.global.ci.lb)[i] <<- .format.intercept.name
-        rownames(.global.ci.rb)[i] <<- .format.intercept.name
-        rownames(.global.t.stats)[i] <<- .format.intercept.name
-        rownames(.global.p.values)[i] <<- .format.intercept.name
+        gbl$coefficient.variables[i] <<- fmt$intercept.name   
+        rownames(gbl$coefficients)[i] <<- fmt$intercept.name
+        rownames(gbl$std.errors)[i] <<- fmt$intercept.name
+        rownames(gbl$ci.lb)[i] <<- fmt$intercept.name
+        rownames(gbl$ci.rb)[i] <<- fmt$intercept.name
+        rownames(gbl$t.stats)[i] <<- fmt$intercept.name
+        rownames(gbl$p.values)[i] <<- fmt$intercept.name
       }
     }
     
     # put intercept on bottom if necessary
     if (!is.null(intercept.position)) {
       # hold contents of last row in placeholder variables
-      placehold.coefficient.variables <- .global.coefficient.variables[-intercept.position]
-      intercept.coefficient.variables <- .global.coefficient.variables[intercept.position]
+      placehold.coefficient.variables <- gbl$coefficient.variables[-intercept.position]
+      intercept.coefficient.variables <- gbl$coefficient.variables[intercept.position]
       
-      if (.format.intercept.bottom) {
-        .global.coefficient.variables <<- c(placehold.coefficient.variables, intercept.coefficient.variables)
+      if (fmt$intercept.bottom) {
+        gbl$coefficient.variables <<- c(placehold.coefficient.variables, intercept.coefficient.variables)
       }
       
-      if (.format.intercept.top) {
-        .global.coefficient.variables <<- c(intercept.coefficient.variables, placehold.coefficient.variables)
+      if (fmt$intercept.top) {
+        gbl$coefficient.variables <<- c(intercept.coefficient.variables, placehold.coefficient.variables)
       }
     } 
     
     
     # order according to user's wishes
-    old.order <- 1:length(.global.coefficient.variables)
+    old.order <- 1:length(gbl$coefficient.variables)
     new.order <- NULL; add.these <- NULL
     
     if (!is.null(order)) {
       # if order is regular expression...
       if (is.character(order)) {
-        not.ordered.yet <- .global.coefficient.variables
+        not.ordered.yet <- gbl$coefficient.variables
         
         for (i in 1:length(order)) {
-          add.these <- grep(order[i], not.ordered.yet, perl=.format.perl, fixed=FALSE)
+          add.these <- grep(order[i], not.ordered.yet, perl=fmt$perl, fixed=FALSE)
           not.ordered.yet[add.these] <- NA
           if (length(add.these) != 0) {
             new.order <- c(new.order, add.these)
@@ -428,7 +428,7 @@ is.wholenumber <-
     else { new.order <- old.order }
     
     # set the right order
-    .global.coefficient.variables[old.order] <<- .global.coefficient.variables[new.order]
+    gbl$coefficient.variables[old.order] <<- gbl$coefficient.variables[new.order]
   }
 
 .insert.col.front <- function(d, new.col) {
@@ -449,7 +449,7 @@ is.wholenumber <-
 .order.data.frame <- 
   function(d, order, summary=FALSE) {
     
-    if ((.format.rownames == TRUE) & (summary == FALSE)) {  # if we want to report rownames, add them to data frame
+    if ((fmt$rownames == TRUE) & (summary == FALSE)) {  # if we want to report rownames, add them to data frame
       if (!is.null(rownames(d))) { d <- .insert.col.front(d, rownames(d)) }
     }
     
@@ -463,7 +463,7 @@ is.wholenumber <-
         not.ordered.yet <- colnames(d)
         
         for (i in 1:length(order)) {
-          add.these <- grep(order[i], d, perl=.format.perl, fixed=FALSE)
+          add.these <- grep(order[i], d, perl=fmt$perl, fixed=FALSE)
           not.ordered.yet[add.these] <- NA
           if (length(add.these) != 0) {
             new.order <- c(new.order, add.these)
@@ -491,28 +491,28 @@ is.wholenumber <-
   function(part.number=NULL) {
     
     # if no additional lines, then quit the function
-    if (is.null(.format.add.lines)) { return(NULL) }
+    if (is.null(fmt$add.lines)) { return(NULL) }
     
-    max.l <- length(.global.models)+1
-    for (line in 1:length(.format.add.lines)) {
+    max.l <- length(gbl$models)+1
+    for (line in 1:length(fmt$add.lines)) {
       ## add columns if too few, remove if too many
-      if (max.l > length(.format.add.lines[[line]])) {
-        .format.add.lines[[line]] <- c(.format.add.lines[[line]], rep(NA, times=max.l - length(.format.add.lines[[line]])))		
+      if (max.l > length(fmt$add.lines[[line]])) {
+        fmt$add.lines[[line]] <- c(fmt$add.lines[[line]], rep(NA, times=max.l - length(fmt$add.lines[[line]])))		
       }
-      else if (max.l < length(.format.add.lines[[line]])) {
-        .format.add.lines[[line]] <- .format.add.lines[[line]][1:max.l]
+      else if (max.l < length(fmt$add.lines[[line]])) {
+        fmt$add.lines[[line]] <- fmt$add.lines[[line]][1:max.l]
       }
       
-      .format.add.lines[[line]] <- .format.add.lines[[line]]
+      fmt$add.lines[[line]] <- fmt$add.lines[[line]]
       
       ## print each line
       for (i in 1:max.l) {
-        if (!is.na(.format.add.lines[[line]][i])) { 
+        if (!is.na(fmt$add.lines[[line]][i])) { 
           if (i==1) {
-            cat(.format.add.lines[[line]][i], sep="") 
+            cat(fmt$add.lines[[line]][i], sep="") 
           }
           else {
-            cat(" & ",.format.add.lines[[line]][i], sep="") 
+            cat(" & ",fmt$add.lines[[line]][i], sep="") 
           }
         }
         else { 
@@ -530,4 +530,4 @@ is.wholenumber <-
   }
 
 
-replace.dec.mark <- function(s) { return (gsub(".", .format.decimal.character, s, fixed=TRUE))}
+replace.dec.mark <- function(s) { return (gsub(".", fmt$decimal.character, s, fixed=TRUE))}

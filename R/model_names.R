@@ -1,4 +1,4 @@
-.format.model.names <- cbind(
+fmt$model.names <- cbind(
   
   c("aov","ANOVA",""), 
   c("arima","ARIMA",""), 

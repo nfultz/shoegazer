@@ -12,7 +12,7 @@
     }
     
     if (.model.identify(object.name) == "rq") {
-      .summary.object <<- suppressMessages(summary(object.name, se=.format.rq.se))
+      .summary.object <<- suppressMessages(summary(object.name, se=fmt$rq.se))
     }
     
     model.num.total <- 1   # model number for multinom, etc.
@@ -24,46 +24,46 @@
     
     for (model.num in 1:model.num.total) {
       
-      .global.models <<- append(.global.models, .model.identify(object.name))
+      gbl$models <<- append(gbl$models, .model.identify(object.name))
       
-      .global.dependent.variables <<- append(.global.dependent.variables, .dependent.variable(object.name, model.num))
-      .global.dependent.variables.written <<- append(.global.dependent.variables.written, .dependent.variable.written(object.name, model.num))
+      gbl$dependent.variables <<- append(gbl$dependent.variables, .dependent.variable(object.name, model.num))
+      gbl$dependent.variables.written <<- append(gbl$dependent.variables.written, .dependent.variable.written(object.name, model.num))
       
-      .global.N <<- append(.global.N, .number.observations(object.name))
-      .global.LL <<- append(.global.LL, .log.likelihood(object.name))
-      .global.R2 <<- append(.global.R2, .r.squared(object.name))
-      .global.max.R2 <<- append(.global.max.R2, .max.r.squared(object.name))
-      .global.adj.R2 <<- append(.global.adj.R2, .adj.r.squared(object.name))
-      .global.AIC <<- append(.global.AIC, .AIC(object.name))
-      .global.BIC <<- append(.global.BIC, .BIC(object.name))
-      .global.scale <<- append(.global.scale, .get.scale(object.name))
-      .global.UBRE <<- append(.global.UBRE, .gcv.UBRE(object.name))
-      .global.sigma2 <<- append(.global.sigma2, .get.sigma2(object.name))
+      gbl$N <<- append(gbl$N, .number.observations(object.name))
+      gbl$LL <<- append(gbl$LL, .log.likelihood(object.name))
+      gbl$R2 <<- append(gbl$R2, .r.squared(object.name))
+      gbl$max.R2 <<- append(gbl$max.R2, .max.r.squared(object.name))
+      gbl$adj.R2 <<- append(gbl$adj.R2, .adj.r.squared(object.name))
+      gbl$AIC <<- append(gbl$AIC, .AIC(object.name))
+      gbl$BIC <<- append(gbl$BIC, .BIC(object.name))
+      gbl$scale <<- append(gbl$scale, .get.scale(object.name))
+      gbl$UBRE <<- append(gbl$UBRE, .gcv.UBRE(object.name))
+      gbl$sigma2 <<- append(gbl$sigma2, .get.sigma2(object.name))
       
       
-      .global.rho <<- cbind(.global.rho, .get.rho(object.name))
-      .global.mills <<- cbind(.global.mills, .get.mills(object.name))
-      .global.theta <<- cbind(.global.theta, .get.theta(object.name))
-      .global.SER <<- cbind(.global.SER, .SER(object.name))
-      .global.F.stat <<- cbind(.global.F.stat, .F.stat(object.name))
-      .global.chi.stat <<- cbind(.global.chi.stat, .chi.stat(object.name))
-      .global.wald.stat <<- cbind(.global.wald.stat, .wald.stat(object.name))
-      .global.lr.stat <<- cbind(.global.lr.stat, .lr.stat(object.name))
-      .global.logrank.stat <<- cbind(.global.logrank.stat, .logrank.stat(object.name))
-      .global.null.deviance <<- cbind(.global.null.deviance, .null.deviance(object.name))
-      .global.residual.deviance <<- cbind(.global.residual.deviance, .residual.deviance(object.name))
+      gbl$rho <<- cbind(gbl$rho, .get.rho(object.name))
+      gbl$mills <<- cbind(gbl$mills, .get.mills(object.name))
+      gbl$theta <<- cbind(gbl$theta, .get.theta(object.name))
+      gbl$SER <<- cbind(gbl$SER, .SER(object.name))
+      gbl$F.stat <<- cbind(gbl$F.stat, .F.stat(object.name))
+      gbl$chi.stat <<- cbind(gbl$chi.stat, .chi.stat(object.name))
+      gbl$wald.stat <<- cbind(gbl$wald.stat, .wald.stat(object.name))
+      gbl$lr.stat <<- cbind(gbl$lr.stat, .lr.stat(object.name))
+      gbl$logrank.stat <<- cbind(gbl$logrank.stat, .logrank.stat(object.name))
+      gbl$null.deviance <<- cbind(gbl$null.deviance, .null.deviance(object.name))
+      gbl$residual.deviance <<- cbind(gbl$residual.deviance, .residual.deviance(object.name))
       
-      max.length <- length(.global.coefficient.variables)+length(.coefficient.variables(object.name))
+      max.length <- length(gbl$coefficient.variables)+length(.coefficient.variables(object.name))
       
       # add RHS variables and coefficients
       coef.var <- .coefficient.variables(object.name)
-      .global.coef.vars.by.model <<-  cbind(.global.coef.vars.by.model, coef.var)
+      gbl$coef.vars.by.model <<-  cbind(gbl$coef.vars.by.model, coef.var)
       
       temp.gcv <- rep(NA,each=1,times=max.length)
       
-      temp.gcv[1:length(.global.coefficient.variables)] <- .global.coefficient.variables
+      temp.gcv[1:length(gbl$coefficient.variables)] <- gbl$coefficient.variables
       
-      how.many.gcv <- length(.global.coefficient.variables)
+      how.many.gcv <- length(gbl$coefficient.variables)
       
       # try to find variable
       position <- 0
@@ -71,8 +71,8 @@
         
         found <- FALSE
         
-        for (j in seq(1:length(.global.coefficient.variables))) {
-          if (coef.var[i] == .global.coefficient.variables[j]) {
+        for (j in seq(1:length(gbl$coefficient.variables))) {
+          if (coef.var[i] == gbl$coefficient.variables[j]) {
             found <- TRUE
             for (k in 1:how.many.gcv) {
               if (coef.var[i]==temp.gcv[k]) {
@@ -98,15 +98,15 @@
         
       }
       
-      .global.coefficient.variables <<- temp.gcv[1:how.many.gcv]
+      gbl$coefficient.variables <<- temp.gcv[1:how.many.gcv]
       
       # build up coefficients from scratch
-      temp.coefficients <- temp.std.errors <- temp.ci.lb <- temp.ci.rb <- temp.t.stats <- temp.p.values <- matrix(data = NA, nrow = length(.global.coefficient.variables), ncol = ncol(.global.coefficients)+1)
-      rownames(temp.coefficients) <- rownames(temp.std.errors) <- rownames(temp.ci.lb) <- rownames(temp.ci.rb) <- rownames(temp.t.stats) <- rownames(temp.p.values) <- .global.coefficient.variables
+      temp.coefficients <- temp.std.errors <- temp.ci.lb <- temp.ci.rb <- temp.t.stats <- temp.p.values <- matrix(data = NA, nrow = length(gbl$coefficient.variables), ncol = ncol(gbl$coefficients)+1)
+      rownames(temp.coefficients) <- rownames(temp.std.errors) <- rownames(temp.ci.lb) <- rownames(temp.ci.rb) <- rownames(temp.t.stats) <- rownames(temp.p.values) <- gbl$coefficient.variables
       
       # fill in from previous iteration of .global coefficients
       which.variable <- 0
-      for (row in .global.coefficient.variables) {
+      for (row in gbl$coefficient.variables) {
         
         which.variable <- which.variable + 1
         
@@ -116,29 +116,29 @@
         #skip all of this if omitted based on regular expression
         omitted <- FALSE
         
-        if (!is.null(.format.omit.regexp)) {
-          for (i in seq(1:length(.format.omit.regexp))) {
-            if (length(grep(.format.omit.regexp[i], row.i, perl=.format.perl, fixed=FALSE))!=0) { omitted <- TRUE	}
+        if (!is.null(fmt$omit.regexp)) {
+          for (i in seq(1:length(fmt$omit.regexp))) {
+            if (length(grep(fmt$omit.regexp[i], row.i, perl=fmt$perl, fixed=FALSE))!=0) { omitted <- TRUE	}
           }
         }
         
-        if (!is.null(.format.keep.regexp)) {
+        if (!is.null(fmt$keep.regexp)) {
           omitted <- TRUE
-          for (i in seq(1:length(.format.keep.regexp))) {
-            if (length(grep(.format.keep.regexp[i], row.i, perl=.format.perl, fixed=FALSE))!=0) { omitted <- FALSE	}
+          for (i in seq(1:length(fmt$keep.regexp))) {
+            if (length(grep(fmt$keep.regexp[i], row.i, perl=fmt$perl, fixed=FALSE))!=0) { omitted <- FALSE	}
           }
         }
         
-        if (!is.null(.format.omit.index)) {
-          for (i in seq(1:length(.format.omit.index))) {
-            if (.format.omit.index[i] == which.variable) { omitted <- TRUE }
+        if (!is.null(fmt$omit.index)) {
+          for (i in seq(1:length(fmt$omit.index))) {
+            if (fmt$omit.index[i] == which.variable) { omitted <- TRUE }
           }
         }
         
-        if (!is.null(.format.keep.index)) {
+        if (!is.null(fmt$keep.index)) {
           omitted <- TRUE
-          for (i in seq(1:length(.format.keep.index))) {
-            if (.format.keep.index[i] == which.variable) { omitted <- FALSE }
+          for (i in seq(1:length(fmt$keep.index))) {
+            if (fmt$keep.index[i] == which.variable) { omitted <- FALSE }
           }
         }
         
@@ -147,14 +147,14 @@
         
         ###
         
-        for (col in seq(1:ncol(.global.coefficients))) {
-          if (sum(as.vector(rownames(.global.coefficients[,col, drop=FALSE])==row))!=0) { 
-            if (!is.null(.global.coefficients)) { temp.coefficients[row, col] <- .global.coefficients[row, col] }
-            if (!is.null(.global.std.errors)) { temp.std.errors[row, col] <- .global.std.errors[row, col] }
-            if (!is.null(.global.ci.lb)) { temp.ci.lb[row, col] <- .global.ci.lb[row, col] }
-            if (!is.null(.global.ci.rb)) { temp.ci.rb[row, col] <- .global.ci.rb[row, col] }
-            if (!is.null(.global.t.stats)) { temp.t.stats[row, col] <- .global.t.stats[row, col] }
-            if (!is.null(.global.p.values)) { temp.p.values[row, col] <- .global.p.values[row, col] }
+        for (col in seq(1:ncol(gbl$coefficients))) {
+          if (sum(as.vector(rownames(gbl$coefficients[,col, drop=FALSE])==row))!=0) { 
+            if (!is.null(gbl$coefficients)) { temp.coefficients[row, col] <- gbl$coefficients[row, col] }
+            if (!is.null(gbl$std.errors)) { temp.std.errors[row, col] <- gbl$std.errors[row, col] }
+            if (!is.null(gbl$ci.lb)) { temp.ci.lb[row, col] <- gbl$ci.lb[row, col] }
+            if (!is.null(gbl$ci.rb)) { temp.ci.rb[row, col] <- gbl$ci.rb[row, col] }
+            if (!is.null(gbl$t.stats)) { temp.t.stats[row, col] <- gbl$t.stats[row, col] }
+            if (!is.null(gbl$p.values)) { temp.p.values[row, col] <- gbl$p.values[row, col] }
           }
         }
         
@@ -180,12 +180,12 @@
         if (!is.null(.get.p.values(object.name, user.p, auto.p, feed.coef, feed.se, user.coef, user.se, model.num=model.num)[row])) { temp.p.values[row, ncol(temp.std.errors)] <- .get.p.values(object.name, user.p, auto.p, feed.coef, feed.se, user.coef, user.se, model.num=model.num)[row] }
       }
       
-      if (!is.null(temp.coefficients)) { .global.coefficients <<- temp.coefficients }
-      if (!is.null(temp.std.errors)) { .global.std.errors <<- temp.std.errors }
-      if (!is.null(temp.ci.lb)) { .global.ci.lb <<- temp.ci.lb }
-      if (!is.null(temp.ci.rb)) { .global.ci.rb <<- temp.ci.rb }
-      if (!is.null(temp.t.stats)) { .global.t.stats <<- temp.t.stats }
-      if (!is.null(temp.p.values)) { .global.p.values <<- temp.p.values }
+      if (!is.null(temp.coefficients)) { gbl$coefficients <<- temp.coefficients }
+      if (!is.null(temp.std.errors)) { gbl$std.errors <<- temp.std.errors }
+      if (!is.null(temp.ci.lb)) { gbl$ci.lb <<- temp.ci.lb }
+      if (!is.null(temp.ci.rb)) { gbl$ci.rb <<- temp.ci.rb }
+      if (!is.null(temp.t.stats)) { gbl$t.stats <<- temp.t.stats }
+      if (!is.null(temp.p.values)) { gbl$p.values <<- temp.p.values }
       
     }
     

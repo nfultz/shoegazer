@@ -26,7 +26,7 @@ stargazer <-
            summary.logical=TRUE, summary.stat=NULL, nobs=TRUE, mean.sd=TRUE, min.max=TRUE, median=FALSE, 
            iqr=FALSE) {
   
-    o <- options("warn") 
+    o <- options(warn=-1) 
     on.exit(options(o))  
 
 ###########################################
@@ -39,10 +39,13 @@ stargazer <-
     ## error handling
     error.present <- "\n"
     
-	
+	  fmt <- list()
+	  gbl <- list()
+    
+    
     # get object names --- !!! CHECK ORDER
     object.names.string <- deparse(substitute(list(...))) ### for further processing to extract object names
-    .global.object.names.all <- .get.object.names(object.names.string)
+    gbl$object.names.all <- .get.object.names(object.names.string)
   
 	
     # get objects
@@ -52,14 +55,16 @@ stargazer <-
 	
   
     # should we include a summary statistics table when given a data frame
-    .global.summary <- rep(TRUE, times=how.many.objects)
+    gbl$summary <- rep(TRUE, times=how.many.objects)
+    
+    fmt <- list()
     
     ## check if argument input is ok
-    .format.rownames <- TRUE
-    .format.colnames <- TRUE
+    fmt$rownames <- TRUE
+    fmt$colnames <- TRUE
   
     # flip the table?
-    .format.flip <- flip
+    fmt$flip <- flip
   
     if (how.many.objects < 1) { error.present <- c(error.present, "% Error: At least one object is required.\n") }
     else {
@@ -69,23 +74,23 @@ stargazer <-
         
         if (is.data.frame(objects[[i]])) {
           obj.rownames <- rownames(objects[[i]])
-          if (is.null(obj.rownames)) { .format.rownames <- FALSE }
+          if (is.null(obj.rownames)) { fmt$rownames <- FALSE }
         }
         else if ((is.matrix(objects[[i]])) && (class(objects[[i]]) != "coeftest")) { 
           
-          .global.summary[i] <- FALSE   # content output default for matrices
+          gbl$summary[i] <- FALSE   # content output default for matrices
           
           obj.rownames <- rownames(objects[[i]])
           obj.colnames <- colnames(objects[[i]])
           
           if (is.null(obj.rownames)) { 
-            if (.format.flip == FALSE) { .format.rownames <- FALSE }
-            else { .format.colnames <- FALSE }
+            if (fmt$flip == FALSE) { fmt$rownames <- FALSE }
+            else { fmt$colnames <- FALSE }
             obj.rownames <- as.character(c(1:nrow(objects[[i]])))
           }
           if (is.null(obj.colnames)) { 
-            if (.format.flip == FALSE) { .format.colnames <- FALSE }
-            else { .format.rownames <- FALSE }
+            if (fmt$flip == FALSE) { fmt$colnames <- FALSE }
+            else { fmt$rownames <- FALSE }
             obj.colnames <- as.character(c(1:ncol(objects[[i]])))
           }
           
@@ -94,21 +99,21 @@ stargazer <-
         }
         else if (is.vector(objects[[i]])) {
           
-          .global.summary[i] <- FALSE   # content output default for vectors
+          gbl$summary[i] <- FALSE   # content output default for vectors
           
           obj.names <- names(objects[[i]])
           
           if (is.null(obj.names)) { 
-            .format.colnames <- FALSE
-            .format.rownames <- FALSE
+            fmt$colnames <- FALSE
+            fmt$rownames <- FALSE
             obj.names <- as.character(c(1:length(objects[[i]])))
           }
           
           objects[[i]] <- as.data.frame(t(objects[[i]]))
           names(objects[[i]]) <- obj.names
         
-          if (.format.flip == TRUE) { .format.colnames <- FALSE } 
-          else { .format.rownames <- FALSE }
+          if (fmt$flip == TRUE) { fmt$colnames <- FALSE } 
+          else { fmt$rownames <- FALSE }
         }
           
         if (!is.data.frame(objects[[i]])) {
@@ -462,149 +467,149 @@ stargazer <-
 
     # initialize pseudo-global variables at NULL
     .summary.object <- NULL
-    .global.dependent.variables.written <- NULL
-    .global.coefficients <- NULL
-    .format.model.left <- NULL
-    .format.model.right <- NULL
+    gbl$dependent.variables.written <- NULL
+    gbl$coefficients <- NULL
+    fmt$model.left <- NULL
+    fmt$model.right <- NULL
     .which.variable.label <- NULL
     .return.value <- NULL
     .publish.horizontal.line <- NULL
     .table.part.published <- NULL
-    .format.omit.table <- NULL
+    fmt$omit.table <- NULL
 
     # info about the package and author
-    .global.package.name <- "stargazer"
-    .global.package.version <- "5.2"
-    .global.package.author.name <- "Marek Hlavac"
-    .global.package.author.affiliation <- "Harvard University"
-    .global.package.author.email <- "hlavac at fas.harvard.edu"
+    gbl$package.name <- "stargazer"
+    gbl$package.version <- "5.2"
+    gbl$package.author.name <- "Marek Hlavac"
+    gbl$package.author.affiliation <- "Harvard University"
+    gbl$package.author.email <- "hlavac at fas.harvard.edu"
     
     # statistics (.global variables)
-    .global.formulas.rhs <- NULL
-    .global.models <- NULL
-    .global.dependent.variables <- NULL
-    .global.coefficient.variables <- NULL
-    .global.coef.vars.by.model <- NULL  ## list of coefficient variables by model - to be used by omit, omit.labels, etc
-    .global.std.errors <- NULL
-    .global.ci.lb <- NULL
-    .global.ci.rb <- NULL
-    .global.t.stats <- NULL
-    .global.p.values <- NULL
-    .global.N <- NULL
-    .global.LL <- NULL
-    .global.R2 <- NULL
-    .global.mills <- NULL
-    .global.max.R2 <- NULL # maximum possible R2 
-    .global.adj.R2 <- NULL
-    .global.AIC <- NULL
-    .global.BIC <- NULL
-    .global.scale <- NULL   # estimated scale parameter (gee)
-    .global.UBRE <- NULL    # UBRE score (GAM)
-    .global.sigma2 <- NULL  # sigma2 from arima
-    .global.theta <- NULL   # theta from negative binomial
-    .global.rho <- NULL
+    gbl$formulas.rhs <- NULL
+    gbl$models <- NULL
+    gbl$dependent.variables <- NULL
+    gbl$coefficient.variables <- NULL
+    gbl$coef.vars.by.model <- NULL  ## list of coefficient variables by model - to be used by omit, omit.labels, etc
+    gbl$std.errors <- NULL
+    gbl$ci.lb <- NULL
+    gbl$ci.rb <- NULL
+    gbl$t.stats <- NULL
+    gbl$p.values <- NULL
+    gbl$N <- NULL
+    gbl$LL <- NULL
+    gbl$R2 <- NULL
+    gbl$mills <- NULL
+    gbl$max.R2 <- NULL # maximum possible R2 
+    gbl$adj.R2 <- NULL
+    gbl$AIC <- NULL
+    gbl$BIC <- NULL
+    gbl$scale <- NULL   # estimated scale parameter (gee)
+    gbl$UBRE <- NULL    # UBRE score (GAM)
+    gbl$sigma2 <- NULL  # sigma2 from arima
+    gbl$theta <- NULL   # theta from negative binomial
+    gbl$rho <- NULL
   
-    .global.sel.equation <- NULL # selection equation, as opposed to default outcome equation, in heckit and 
-    .global.zero.component <- NULL # zero, as opposed to count, component in hurdle and zeroinfl
+    gbl$sel.equation <- NULL # selection equation, as opposed to default outcome equation, in heckit and 
+    gbl$zero.component <- NULL # zero, as opposed to count, component in hurdle and zeroinfl
     
     # with degrees of freedom
-    .global.SER <- NULL   # residual standard error; standard error of the regression
-    .global.F.stat <- NULL # F-statistic for the regression
-    .global.chi.stat <- NULL  # chi-squared statistic
-    .global.wald.stat <- NULL # Wald test statistic (for coxph)
-    .global.lr.stat <- NULL  # LR test statistic (for coxph)
-    .global.logrank.stat <- NULL # Score (logrank) test (for coxph)
-    .global.null.deviance <- NULL 
-    .global.residual.deviance <- NULL
+    gbl$SER <- NULL   # residual standard error; standard error of the regression
+    gbl$F.stat <- NULL # F-statistic for the regression
+    gbl$chi.stat <- NULL  # chi-squared statistic
+    gbl$wald.stat <- NULL # Wald test statistic (for coxph)
+    gbl$lr.stat <- NULL  # LR test statistic (for coxph)
+    gbl$logrank.stat <- NULL # Score (logrank) test (for coxph)
+    gbl$null.deviance <- NULL 
+    gbl$residual.deviance <- NULL
     
     # intercept strings
-    .global.intercept.strings <- c("(Intercept)", "(intercept)","Intercept")
+    gbl$intercept.strings <- c("(Intercept)", "(intercept)","Intercept")
     
     # .formatting: Default
-    .format.space.size <- "-1.8ex"
+    fmt$space.size <- "-1.8ex"
     
-    .format.dependent.variable.text <- "\\textit{Dependent variable:}"
-    .format.dependent.variable.text.underline <- TRUE
-    .format.dependent.variable.text.on <- TRUE
+    fmt$dependent.variable.text <- "\\textit{Dependent variable:}"
+    fmt$dependent.variable.text.underline <- TRUE
+    fmt$dependent.variable.text.on <- TRUE
     
-    .format.dep.var.labels <- NULL
-    .format.covariate.labels <- NULL
-    .format.add.lines <- NULL
+    fmt$dep.var.labels <- NULL
+    fmt$covariate.labels <- NULL
+    fmt$add.lines <- NULL
     
-    .format.dependent.variables.text <- ""
-    .format.underline.dependent.variables <- TRUE
-    .format.dependent.variables.left <- ""
-    .format.dependent.variables.right <- ""
-    .format.dependent.variables.capitalize <- FALSE
+    fmt$dependent.variables.text <- ""
+    fmt$underline.dependent.variables <- TRUE
+    fmt$dependent.variables.left <- ""
+    fmt$dependent.variables.right <- ""
+    fmt$dependent.variables.capitalize <- FALSE
     
-    .format.ordered.intercepts <- TRUE
+    fmt$ordered.intercepts <- TRUE
   
     # column labels
-    .format.column.left <- ""
-    .format.column.right <- ""
+    fmt$column.left <- ""
+    fmt$column.right <- ""
     
     # model numbers
-    .format.model.numbers <- TRUE
+    fmt$model.numbers <- TRUE
         
     # common headers for multiple columns?
-    .format.multicolumn <- TRUE
+    fmt$multicolumn <- TRUE
     
     # names for models
-    .format.model.names.include <- TRUE
-    .format.model.names <- NULL
-    .format.model.names <- cbind(c("aov","ANOVA",""), c("arima","ARIMA",""), c("Arima","ARIMA",""), c("blogit","bivariate","logistic"))
-    .format.model.names <- cbind(.format.model.names, c("bprobit","bivariate","probit"), c("betareg", "beta",""), c("chopit","compound hierarchical","ordered probit"))
-    .format.model.names <- cbind(.format.model.names, c("clm","cumulative","link"), c("censReg", "censored", "regression"), c("cloglog.net","network compl.","log log"), c("clogit","conditional","logistic"), c("coxph","Cox","prop. hazards"))
-    .format.model.names <- cbind(.format.model.names, c("dynlm","dynamic","linear"), c("lagsarlm","spatial","autoregressive"), c("errorsarlm","spatial","error"))
-    .format.model.names <- cbind(.format.model.names, c("ei.dynamic","Quinn dynamic","ecological inference"), c("ei.hier","$2 \times 2$ hierarchical","ecological inference"))
-    .format.model.names <- cbind(.format.model.names, c("ei.RxC","hierarchical multinominal-Dirichlet","ecological inference"), c("exp","exponential",""), c("ergm","exponential family","random graph"))
-    .format.model.names <- cbind(.format.model.names, c("factor.bayes","Bayesian","factor analysis"), c("factor.mix","mixed data","factor analysis"))
-    .format.model.names <- cbind(.format.model.names, c("factor.ord","ordinal data","factor analysis"), c("fGARCH","GARCH",""), c("gamma","gamma",""))
-    .format.model.names <- cbind(.format.model.names, c("gamma.gee","gamma generalized","estimating equation"), c("gamma.mixed","mixed effects","gamma"))
-    .format.model.names <- cbind(.format.model.names, c("gamma.net","network","gamma"), c("gamma.survey","survey-weighted","gamma"), c("glmrob","robust","GLM"), c("gls","generalized","least squares"))
-    .format.model.names <- cbind(.format.model.names, c("gmm","GMM",""), c("rem.dyad", "relational", "event (dyadic)"))
-    .format.model.names <- cbind(.format.model.names, c("irt1d","IRT","(1-dim.)"), c("irtkd","IRT","(k-dim.)"))
-    .format.model.names <- cbind(.format.model.names, c("logit","logistic",""), c("logit.bayes","Bayesian","logistic"))
-    .format.model.names <- cbind(.format.model.names, c("logit.gam","GAM","(logistic)"), c("logit.gee","logistic generalized","estimating equation"))
-    .format.model.names <- cbind(.format.model.names, c("logit.mixed","mixed effects","logistic"), c("logit.net","network","logistic"))
-    .format.model.names <- cbind(.format.model.names, c("logit.survey","survey-weighted","logistic"), c("lognorm","log-normal",""))
-    .format.model.names <- cbind(.format.model.names, c("lmer","linear","mixed-effects"), c("glmer","generalized linear","mixed-effects"), c("nlmer","non-linear","mixed-effects"))
-    .format.model.names <- cbind(.format.model.names, c("ls","OLS",""), c("ls.mixed","mixed effect","linear"), c("lme","linear","mixed effects"), c("lmrob","MM-type","linear"))
-    .format.model.names <- cbind(.format.model.names, c("ls.net","network","least squares"), c("mlogit","multinomial","logistic"), c("mnlogit","multinomial","logit"))
-    .format.model.names <- cbind(.format.model.names, c("mlogit.bayes","Bayesian","multinomial logistic"), c("negbin","negative","binomial"), c("normal","normal",""))
-    .format.model.names <- cbind(.format.model.names, c("multinom","multinomial log-linear","(neural networks)"), c("nlme","non-linear","mixed effects"))
-    .format.model.names <- cbind(.format.model.names, c("normal.bayes","Bayesian","normal"), c("normal.gam","GAM","(continuous)"))
-    .format.model.names <- cbind(.format.model.names, c("normal.gee","normal generalized","estimating equation"), c("normal.net","network","normal"))
-    .format.model.names <- cbind(.format.model.names, c("normal.survey","survey-weighted","normal"), c("ologit","ordered","logistic"))
-    .format.model.names <- cbind(.format.model.names, c("oprobit","ordered","probit"), c("oprobit.bayes","Bayesian","ordered probit"))
-    .format.model.names <- cbind(.format.model.names, c("pmg","mean","groups"), c("poisson","Poisson",""), c("poisson.bayes","Bayesian","Poisson"))
-    .format.model.names <- cbind(.format.model.names, c("poisson.gam","GAM","(count)"), c("poisson.mixed","mixed effects","Poisson"))
-    .format.model.names <- cbind(.format.model.names, c("poisson.survey","survey-weighted","Poisson"), c("poisson.gee","Poisson generalized","estimation equation"))
-    .format.model.names <- cbind(.format.model.names, c("probit","probit",""), c("probit.bayes","Bayesian","probit"))
-    .format.model.names <- cbind(.format.model.names, c("probit.gam","GAM","(probit)"), c("probit.gee","probit generalized","estimating equation"))
-    .format.model.names <- cbind(.format.model.names, c("probit.mixed","mixed effects","probit"), c("probit.net","network","probit"))
-    .format.model.names <- cbind(.format.model.names, c("probit.survey","survey-weighted","probit"), c("relogit","rare events","logistic"))
-    .format.model.names <- cbind(.format.model.names, c("rq","quantile","regression"))
-    .format.model.names <- cbind(.format.model.names, c("rlm","robust","linear"), c("sur","SUR",""), c("threesls","3SLS",""))
-    .format.model.names <- cbind(.format.model.names, c("tobit","Tobit",""), c("tobit(AER)","Tobit",""), c("tobit.bayes","Bayesian","Tobit"))
-    .format.model.names <- cbind(.format.model.names, c("twosls","2SLS",""), c("weibull","Weibull",""))
-    .format.model.names <- cbind(.format.model.names, c("zeroinfl","zero-inflated","count data"), c("hurdle","hurdle",""))
-    .format.model.names <- cbind(.format.model.names, c("plm","panel","linear"), c("pgmm","panel","GMM"), c("ivreg","instrumental","variable"))
-    .format.model.names <- cbind(.format.model.names, c("coxreg","Cox",""), c("mlreg","ML","prop. hazards"), c("weibreg","Weibull",""))
-    .format.model.names <- cbind(.format.model.names, c("aftreg","accelerated"," failure time"), c("phreg","parametric","prop. hazards"))
-    .format.model.names <- cbind(.format.model.names, c("bj","Buckley-James",""), c("cph","Cox",""), c("Gls","generalized","least squares"), c("lrm","logistic",""))
-    .format.model.names <- cbind(.format.model.names, c("ols","OLS",""), c("psm","parametric","survival"), c("Rq","quantile","regression"))
-    .format.model.names <- cbind(.format.model.names, c("hetglm","heteroskedastic","GLM"), c("coeftest","coefficient","test"))
-    .format.model.names <- cbind(.format.model.names, c("heckit","Heckman","selection"), c("selection","selection",""))
-    .format.model.names <- cbind(.format.model.names, c("probit.ss","probit",""), c("binaryChoice","binary","choice"))
-    .format.model.names <- cbind(.format.model.names, c("brglm","GLM","(bias reduction)"), c("maBina","binary model","(marginal effect)"))
-    .format.model.names <- cbind(.format.model.names, c("mclogit","mixed","conditional logit"))
+    fmt$model.names.include <- TRUE
+    fmt$model.names <- NULL
+    fmt$model.names <- cbind(c("aov","ANOVA",""), c("arima","ARIMA",""), c("Arima","ARIMA",""), c("blogit","bivariate","logistic"))
+    fmt$model.names <- cbind(fmt$model.names, c("bprobit","bivariate","probit"), c("betareg", "beta",""), c("chopit","compound hierarchical","ordered probit"))
+    fmt$model.names <- cbind(fmt$model.names, c("clm","cumulative","link"), c("censReg", "censored", "regression"), c("cloglog.net","network compl.","log log"), c("clogit","conditional","logistic"), c("coxph","Cox","prop. hazards"))
+    fmt$model.names <- cbind(fmt$model.names, c("dynlm","dynamic","linear"), c("lagsarlm","spatial","autoregressive"), c("errorsarlm","spatial","error"))
+    fmt$model.names <- cbind(fmt$model.names, c("ei.dynamic","Quinn dynamic","ecological inference"), c("ei.hier","$2 \times 2$ hierarchical","ecological inference"))
+    fmt$model.names <- cbind(fmt$model.names, c("ei.RxC","hierarchical multinominal-Dirichlet","ecological inference"), c("exp","exponential",""), c("ergm","exponential family","random graph"))
+    fmt$model.names <- cbind(fmt$model.names, c("factor.bayes","Bayesian","factor analysis"), c("factor.mix","mixed data","factor analysis"))
+    fmt$model.names <- cbind(fmt$model.names, c("factor.ord","ordinal data","factor analysis"), c("fGARCH","GARCH",""), c("gamma","gamma",""))
+    fmt$model.names <- cbind(fmt$model.names, c("gamma.gee","gamma generalized","estimating equation"), c("gamma.mixed","mixed effects","gamma"))
+    fmt$model.names <- cbind(fmt$model.names, c("gamma.net","network","gamma"), c("gamma.survey","survey-weighted","gamma"), c("glmrob","robust","GLM"), c("gls","generalized","least squares"))
+    fmt$model.names <- cbind(fmt$model.names, c("gmm","GMM",""), c("rem.dyad", "relational", "event (dyadic)"))
+    fmt$model.names <- cbind(fmt$model.names, c("irt1d","IRT","(1-dim.)"), c("irtkd","IRT","(k-dim.)"))
+    fmt$model.names <- cbind(fmt$model.names, c("logit","logistic",""), c("logit.bayes","Bayesian","logistic"))
+    fmt$model.names <- cbind(fmt$model.names, c("logit.gam","GAM","(logistic)"), c("logit.gee","logistic generalized","estimating equation"))
+    fmt$model.names <- cbind(fmt$model.names, c("logit.mixed","mixed effects","logistic"), c("logit.net","network","logistic"))
+    fmt$model.names <- cbind(fmt$model.names, c("logit.survey","survey-weighted","logistic"), c("lognorm","log-normal",""))
+    fmt$model.names <- cbind(fmt$model.names, c("lmer","linear","mixed-effects"), c("glmer","generalized linear","mixed-effects"), c("nlmer","non-linear","mixed-effects"))
+    fmt$model.names <- cbind(fmt$model.names, c("ls","OLS",""), c("ls.mixed","mixed effect","linear"), c("lme","linear","mixed effects"), c("lmrob","MM-type","linear"))
+    fmt$model.names <- cbind(fmt$model.names, c("ls.net","network","least squares"), c("mlogit","multinomial","logistic"), c("mnlogit","multinomial","logit"))
+    fmt$model.names <- cbind(fmt$model.names, c("mlogit.bayes","Bayesian","multinomial logistic"), c("negbin","negative","binomial"), c("normal","normal",""))
+    fmt$model.names <- cbind(fmt$model.names, c("multinom","multinomial log-linear","(neural networks)"), c("nlme","non-linear","mixed effects"))
+    fmt$model.names <- cbind(fmt$model.names, c("normal.bayes","Bayesian","normal"), c("normal.gam","GAM","(continuous)"))
+    fmt$model.names <- cbind(fmt$model.names, c("normal.gee","normal generalized","estimating equation"), c("normal.net","network","normal"))
+    fmt$model.names <- cbind(fmt$model.names, c("normal.survey","survey-weighted","normal"), c("ologit","ordered","logistic"))
+    fmt$model.names <- cbind(fmt$model.names, c("oprobit","ordered","probit"), c("oprobit.bayes","Bayesian","ordered probit"))
+    fmt$model.names <- cbind(fmt$model.names, c("pmg","mean","groups"), c("poisson","Poisson",""), c("poisson.bayes","Bayesian","Poisson"))
+    fmt$model.names <- cbind(fmt$model.names, c("poisson.gam","GAM","(count)"), c("poisson.mixed","mixed effects","Poisson"))
+    fmt$model.names <- cbind(fmt$model.names, c("poisson.survey","survey-weighted","Poisson"), c("poisson.gee","Poisson generalized","estimation equation"))
+    fmt$model.names <- cbind(fmt$model.names, c("probit","probit",""), c("probit.bayes","Bayesian","probit"))
+    fmt$model.names <- cbind(fmt$model.names, c("probit.gam","GAM","(probit)"), c("probit.gee","probit generalized","estimating equation"))
+    fmt$model.names <- cbind(fmt$model.names, c("probit.mixed","mixed effects","probit"), c("probit.net","network","probit"))
+    fmt$model.names <- cbind(fmt$model.names, c("probit.survey","survey-weighted","probit"), c("relogit","rare events","logistic"))
+    fmt$model.names <- cbind(fmt$model.names, c("rq","quantile","regression"))
+    fmt$model.names <- cbind(fmt$model.names, c("rlm","robust","linear"), c("sur","SUR",""), c("threesls","3SLS",""))
+    fmt$model.names <- cbind(fmt$model.names, c("tobit","Tobit",""), c("tobit(AER)","Tobit",""), c("tobit.bayes","Bayesian","Tobit"))
+    fmt$model.names <- cbind(fmt$model.names, c("twosls","2SLS",""), c("weibull","Weibull",""))
+    fmt$model.names <- cbind(fmt$model.names, c("zeroinfl","zero-inflated","count data"), c("hurdle","hurdle",""))
+    fmt$model.names <- cbind(fmt$model.names, c("plm","panel","linear"), c("pgmm","panel","GMM"), c("ivreg","instrumental","variable"))
+    fmt$model.names <- cbind(fmt$model.names, c("coxreg","Cox",""), c("mlreg","ML","prop. hazards"), c("weibreg","Weibull",""))
+    fmt$model.names <- cbind(fmt$model.names, c("aftreg","accelerated"," failure time"), c("phreg","parametric","prop. hazards"))
+    fmt$model.names <- cbind(fmt$model.names, c("bj","Buckley-James",""), c("cph","Cox",""), c("Gls","generalized","least squares"), c("lrm","logistic",""))
+    fmt$model.names <- cbind(fmt$model.names, c("ols","OLS",""), c("psm","parametric","survival"), c("Rq","quantile","regression"))
+    fmt$model.names <- cbind(fmt$model.names, c("hetglm","heteroskedastic","GLM"), c("coeftest","coefficient","test"))
+    fmt$model.names <- cbind(fmt$model.names, c("heckit","Heckman","selection"), c("selection","selection",""))
+    fmt$model.names <- cbind(fmt$model.names, c("probit.ss","probit",""), c("binaryChoice","binary","choice"))
+    fmt$model.names <- cbind(fmt$model.names, c("brglm","GLM","(bias reduction)"), c("maBina","binary model","(marginal effect)"))
+    fmt$model.names <- cbind(fmt$model.names, c("mclogit","mixed","conditional logit"))
   
     # if you use, say, glm() that does not correspond to one of the pre-defined models, put this as family and link
-    .format.model.function <- TRUE
-    .format.model.family <- ""
-    .format.model.dist <- ""
-    .format.model.link <- "link = "
+    fmt$model.function <- TRUE
+    fmt$model.family <- ""
+    fmt$model.dist <- ""
+    fmt$model.link <- "link = "
     
     ## names for journal/output styles
     # economics
@@ -612,123 +617,123 @@ stargazer <-
     .journal.style.names <- cbind(.journal.style.names, c("jpe","Journal of Political Economy"), c("jel","Journal of Economic Literature"))
     .journal.style.names <- cbind(.journal.style.names, c("jep","Journal of Economic Perspestives"))
     
-    .format.coefficient.variables.capitalize <- FALSE
-    .format.coefficient.variables.left <- ""
-    .format.coefficient.variables.right <- ""
-    .format.coefficient.table.parts <- c("variable name","coefficient*","standard error"," ")
+    fmt$coefficient.variables.capitalize <- FALSE
+    fmt$coefficient.variables.left <- ""
+    fmt$coefficient.variables.right <- ""
+    fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error"," ")
     
     ## .formatting of numeric output
     # keep initial zeros?
-    .format.initial.zero <- TRUE
+    fmt$initial.zero <- TRUE
     # if all zeros, keep going until you find a non-zero digit
-    .format.until.nonzero.digit <- TRUE
-    .format.max.extra.digits <- 2
+    fmt$until.nonzero.digit <- TRUE
+    fmt$max.extra.digits <- 2
     
     ## threshholds for the stars
-    .format.stars <- "*"
-    .format.cutoffs <- c(0.1, 0.05, 0.01)
+    fmt$stars <- "*"
+    fmt$cutoffs <- c(0.1, 0.05, 0.01)
     
-    .format.std.errors.left <- "("
-    .format.std.errors.right <- ")"
+    fmt$std.errors.left <- "("
+    fmt$std.errors.right <- ")"
     
-    .format.p.values.left <- "p = "
-    .format.p.values.right <- ""
+    fmt$p.values.left <- "p = "
+    fmt$p.values.right <- ""
     
-    .format.t.stats.left <- "t = "
-    .format.t.stats.right <- ""
+    fmt$t.stats.left <- "t = "
+    fmt$t.stats.right <- ""
     
-    .format.models.text <- ""
-    .format.models.left <- "\\textit{"
-    .format.models.right <- "}"
-    .format.underline.models <- FALSE
-    .format.models.skip.if.one <- TRUE # skip models section if only one model in table?
-    .format.object.names <- FALSE
+    fmt$models.text <- ""
+    fmt$models.left <- "\\textit{"
+    fmt$models.right <- "}"
+    fmt$underline.models <- FALSE
+    fmt$models.skip.if.one <- TRUE # skip models section if only one model in table?
+    fmt$object.names <- FALSE
     
-    .format.numbers.text <- ""
-    .format.numbers.left <- "("
-    .format.numbers.right <- ")"
-    .format.numbers.roman <- FALSE
+    fmt$numbers.text <- ""
+    fmt$numbers.left <- "("
+    fmt$numbers.right <- ")"
+    fmt$numbers.roman <- FALSE
     
-    .format.digit.separator.where <- c(3)    # how 'often' to separate digits (e.g., thousands separator = 3)
-    .format.digit.separator <- ","
-    .format.ci.separator <- ", "
-    .format.round.digits <- 3
-    # for decimal comma use: .format.decimal.character <- "{,}"
-    .format.decimal.character <- "."
-    .format.dec.mark.align <- FALSE
+    fmt$digit.separator.where <- c(3)    # how 'often' to separate digits (e.g., thousands separator = 3)
+    fmt$digit.separator <- ","
+    fmt$ci.separator <- ", "
+    fmt$round.digits <- 3
+    # for decimal comma use: fmt$decimal.character <- "{,}"
+    fmt$decimal.character <- "."
+    fmt$dec.mark.align <- FALSE
   
     # degrees of freedom - report or not?
-    .format.df <- TRUE
+    fmt$df <- TRUE
     
-    .format.table.parts <- c("=!","dependent variable label","dependent variables","models","colums","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","scale","sigma2","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","null deviance(df)","residual deviance(df)","=!","notes")
+    fmt$table.parts <- c("=!","dependent variable label","dependent variables","models","colums","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","scale","sigma2","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","null deviance(df)","residual deviance(df)","=!","notes")
     
-    .format.omit.regexp <- NULL
-    .format.omit.labels <- NULL
-    .format.omit.yes <- "Yes"
-    .format.omit.no <- "No"
+    fmt$omit.regexp <- NULL
+    fmt$omit.labels <- NULL
+    fmt$omit.yes <- "Yes"
+    fmt$omit.no <- "No"
   
-    .format.keep.regexp <- NULL
+    fmt$keep.regexp <- NULL
     
-    .format.N <- "Observations"
-    .format.LL <- "Log Likelihood"
-    .format.R2 <- "R$^{2}$"
-    .format.max.R2 <- "Max. Possible R$^{2}$"
-    .format.adj.R2 <- "Adjusted R$^{2}$"
-    .format.scale <- "Scale Parameter"
-    .format.UBRE <- "UBRE"
-    .format.rho <- "$\\rho$"
-    .format.mills <- "Inverse Mills Ratio"
-    .format.AIC <- "Akaike Inf. Crit."
-    .format.BIC <- "Bayesian Inf. Crit."
-    .format.sigma2 <- "$\\sigma^{2}$"
-    .format.theta <- "$\\theta$"
+    fmt$N <- "Observations"
+    fmt$LL <- "Log Likelihood"
+    fmt$R2 <- "R$^{2}$"
+    fmt$max.R2 <- "Max. Possible R$^{2}$"
+    fmt$adj.R2 <- "Adjusted R$^{2}$"
+    fmt$scale <- "Scale Parameter"
+    fmt$UBRE <- "UBRE"
+    fmt$rho <- "$\\rho$"
+    fmt$mills <- "Inverse Mills Ratio"
+    fmt$AIC <- "Akaike Inf. Crit."
+    fmt$BIC <- "Bayesian Inf. Crit."
+    fmt$sigma2 <- "$\\sigma^{2}$"
+    fmt$theta <- "$\\theta$"
     
-    .format.SER <- "Residual Std. Error"
-    .format.F.stat <- "F Statistic"
-    .format.chi.stat <- "$\\chi^{2}$"
-    .format.wald.stat <- "Wald Test"
-    .format.lr.stat <- "LR Test"
-    .format.logrank.stat <- "Score (Logrank) Test"
-    .format.null.deviance <- "Null Deviance"
-    .format.residual.deviance <- "Residual Deviance"
+    fmt$SER <- "Residual Std. Error"
+    fmt$F.stat <- "F Statistic"
+    fmt$chi.stat <- "$\\chi^{2}$"
+    fmt$wald.stat <- "Wald Test"
+    fmt$lr.stat <- "LR Test"
+    fmt$logrank.stat <- "Score (Logrank) Test"
+    fmt$null.deviance <- "Null Deviance"
+    fmt$residual.deviance <- "Residual Deviance"
     
-    .format.df.left <- "(df = "
-    .format.df.right <- ")"
-    .format.df.separator <- "; "
-    .format.intelligent.df <- TRUE
+    fmt$df.left <- "(df = "
+    fmt$df.right <- ")"
+    fmt$df.separator <- "; "
+    fmt$intelligent.df <- TRUE
     
     # this is for se, tstat, p.values at the bottom of the table, by statistics
-    .format.se.left <- " ("
-    .format.se.right <- ")"
-    .format.tstat.left <- " (z = "
-    .format.tstat.right <- ")"
-    .format.p.value.left <- " (p = "
-    .format.p.value.right <- ")"
+    fmt$se.left <- " ("
+    fmt$se.right <- ")"
+    fmt$tstat.left <- " (z = "
+    fmt$tstat.right <- ")"
+    fmt$p.value.left <- " (p = "
+    fmt$p.value.right <- ")"
     
-    .format.intercept.name <- "Constant"
-    .format.intercept.bottom <- TRUE
-    .format.note <- "\\textit{Note:} "
-    .format.note.alignment <- "r"
-    .format.note.content <- c("$^{*}$p$<$[0.*]; $^{**}$p$<$[0.**]; $^{***}$p$<$[0.***]")
+    fmt$intercept.name <- "Constant"
+    fmt$intercept.bottom <- TRUE
+    fmt$note <- "\\textit{Note:} "
+    fmt$note.alignment <- "r"
+    fmt$note.content <- c("$^{*}$p$<$[0.*]; $^{**}$p$<$[0.**]; $^{***}$p$<$[0.***]")
     
     #### summary statistic table
-    .format.s.statistics.names <- cbind(c("n","N"), c("nmiss","missing"), c("mean","Mean"), c("sd","St. Dev."), c("median","Median"), c("min","Min"), c("max","Max"), c("mad","Median Abs. Dev."), c("p","Pctl(!)"))
-    .format.s.stat.parts <- c("=!","stat names","-","statistics1","-!","notes")
-    .format.s.statistics.list <- c("n","mean","sd","min","p25","median","p75","max")
+    fmt$s.statistics.names <- cbind(c("n","N"), c("nmiss","missing"), c("mean","Mean"), c("sd","St. Dev."), c("median","Median"), c("min","Min"), c("max","Max"), c("mad","Median Abs. Dev."), c("p","Pctl(!)"))
+    fmt$s.stat.parts <- c("=!","stat names","-","statistics1","-!","notes")
+    fmt$s.statistics.list <- c("n","mean","sd","min","p25","median","p75","max")
     
-    .format.s.statistics.names.left <- ""
-    .format.s.statistics.names.right <- ""
-    .format.s.statistics.names.label <- "Statistic"
+    fmt$s.statistics.names.left <- ""
+    fmt$s.statistics.names.right <- ""
+    fmt$s.statistics.names.label <- "Statistic"
     
-    .format.s.coefficient.variables.capitalize <- FALSE
-    .format.s.coefficient.variables.left <- ""
-    .format.s.coefficient.variables.right <- ""
+    fmt$s.coefficient.variables.capitalize <- FALSE
+    fmt$s.coefficient.variables.left <- ""
+    fmt$s.coefficient.variables.right <- ""
     
-    .format.s.round.digits <- 3
+    fmt$s.round.digits <- 3
     
-    .format.s.note <- ""
-    .format.s.note.alignment <- "l"
-    .format.s.note.content <- NULL
+    fmt$s.note <- ""
+    fmt$s.note.alignment <- "l"
+    fmt$s.note.content <- NULL
 
     ####
     .adjust.settings.style(style)
@@ -750,10 +755,10 @@ stargazer <-
       # fill in values of summary, if NA keep deafult
       for (i in 1:how.many.objects) {
         if (!is.na(summary[i])) {
-          .global.summary[i] <- summary[i]
+          gbl$summary[i] <- summary[i]
         }
         else if (i > 1) {  # if NA fill in previous value of summary
-          .global.summary[i] <- summary[i-1]
+          gbl$summary[i] <- summary[i-1]
         }
       }
     }
@@ -762,101 +767,101 @@ stargazer <-
     ## use formatting arguments
     
     # header with name, version, etc.
-    .format.header <- header
+    fmt$header <- header
     
     # no empty lines? single row for coefficient and std.error/CI?
-    .format.single.row <- single.row
-    if (.format.single.row == TRUE) { .format.no.space <- TRUE }
-    else { .format.no.space <- FALSE }
-    if (!is.null(no.space)) { .format.no.space <- no.space }
+    fmt$single.row <- single.row
+    if (fmt$single.row == TRUE) { fmt$no.space <- TRUE }
+    else { fmt$no.space <- FALSE }
+    if (!is.null(no.space)) { fmt$no.space <- no.space }
     
     # font size
-    .format.font.size <- font.size
+    fmt$font.size <- font.size
     
     # floating, floating environment, etc.
-    .format.floating <- float
-    .format.floating.environment <- float.env
-    .format.table.placement <- table.placement
-    .format.column.sep.width <- column.sep.width
+    fmt$floating <- float
+    fmt$floating.environment <- float.env
+    fmt$table.placement <- table.placement
+    fmt$column.sep.width <- column.sep.width
     
     # if not case-sensitive, transfer to lower case
     if (!is.null(digit.separate)) { digit.separate <- tolower(digit.separate) }
     
     # report df?
-    .format.df <- df
-    if (.format.df == FALSE) {
-      .format.table.parts <- gsub("(df)", "", .format.table.parts, fixed=TRUE)
+    fmt$df <- df
+    if (fmt$df == FALSE) {
+      fmt$table.parts <- gsub("(df)", "", fmt$table.parts, fixed=TRUE)
     }
     
     # column, dependent variable and covariate labels
-    .format.column.labels <- column.labels
-    .format.column.separate <- column.separate
-    .format.covariate.labels <- covariate.labels
-    .format.dep.var.labels <- dep.var.labels
-    .format.add.lines <- add.lines
+    fmt$column.labels <- column.labels
+    fmt$column.separate <- column.separate
+    fmt$covariate.labels <- covariate.labels
+    fmt$dep.var.labels <- dep.var.labels
+    fmt$add.lines <- add.lines
     
     if (dep.var.labels.include == FALSE) {
-      .format.table.parts <- .format.table.parts[.format.table.parts!="dependent variables"] 
+      fmt$table.parts <- fmt$table.parts[fmt$table.parts!="dependent variables"] 
     }
     
     if (!is.null(dep.var.caption)) {
       if (dep.var.caption == "") {
-        .format.table.parts <- .format.table.parts[.format.table.parts!="dependent variable label"]
+        fmt$table.parts <- fmt$table.parts[fmt$table.parts!="dependent variable label"]
       }
       else {
-        .format.dependent.variable.text <- dep.var.caption
+        fmt$dependent.variable.text <- dep.var.caption
       }
     }
     
     # confidence intervals
-    .format.ci <- ci
-    .format.ci.level <- ci.level
-    if (!is.null(ci.separator)) { .format.ci.separator <- ci.separator }
-    if (!is.null(ci.custom)) { .format.ci <- TRUE }
+    fmt$ci <- ci
+    fmt$ci.level <- ci.level
+    if (!is.null(ci.separator)) { fmt$ci.separator <- ci.separator }
+    if (!is.null(ci.custom)) { fmt$ci <- TRUE }
     
     # omit
-    .format.omit.regexp <- omit
-    .format.omit.index <- omit
-    if (is.character(omit)) { .format.omit.index <- NULL }
-    if (is.numeric(omit)) { .format.omit.regexp <- NULL }
+    fmt$omit.regexp <- omit
+    fmt$omit.index <- omit
+    if (is.character(omit)) { fmt$omit.index <- NULL }
+    if (is.numeric(omit)) { fmt$omit.regexp <- NULL }
     
-    .format.omit.labels <- omit.labels
+    fmt$omit.labels <- omit.labels
     if (!is.null(omit.yes.no)) { 
-      .format.omit.yes <- omit.yes.no[1]
-      .format.omit.no <- omit.yes.no[2]
+      fmt$omit.yes <- omit.yes.no[1]
+      fmt$omit.no <- omit.yes.no[2]
     }
     
     # keep
-    .format.keep.regexp <- keep
-    .format.keep.index <- keep
-    if (is.character(keep)) { .format.keep.index <- NULL }
-    if (is.numeric(keep)) { .format.keep.regexp <- NULL }
+    fmt$keep.regexp <- keep
+    fmt$keep.index <- keep
+    if (is.character(keep)) { fmt$keep.index <- NULL }
+    if (is.numeric(keep)) { fmt$keep.regexp <- NULL }
     
     # remove omitted statistics from table parts
     if (!is.null(omit.stat)) {
       .lower.omit.stat <- tolower(omit.stat)    # make it all lower-case
       if ("all" %in% .lower.omit.stat) { .lower.omit.stat <- omit.stat.acceptable }
-      if ("n" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="N"] }
-      if ("rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="R-squared"] }
-      if ("adj.rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="adjusted R-squared"] }
-      if ("max.rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="max R-squared"] }
-      if ("ll" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="log likelihood"] }
-      if ("scale" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="scale"] }
-      if ("sigma2" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="sigma2"] }        
-      if ("theta" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,5)!="theta"] }
-      if ("aic" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="AIC"] }
-      if ("bic" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="BIC"] }
-      if ("ubre" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="UBRE"] }
-      if ("rho" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,3)!="rho"] }
-      if ("mills" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,5)!="Mills"] }
-      if ("ser" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,3)!="SER"] }
-      if ("f" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,11)!="F statistic"] }
-      if ("chi2" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,4)!="chi2"] }
-      if ("wald" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,4)!="Wald"] }
-      if ("lr" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,2)!="LR"] }
-      if ("logrank" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,7)!="logrank"] }
-      if ("null.dev" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,13)!="null deviance"] }
-      if ("res.dev" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,17)!="residual deviance"] }
+      if ("n" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="N"] }
+      if ("rsq" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="R-squared"] }
+      if ("adj.rsq" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="adjusted R-squared"] }
+      if ("max.rsq" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="max R-squared"] }
+      if ("ll" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="log likelihood"] }
+      if ("scale" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="scale"] }
+      if ("sigma2" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="sigma2"] }        
+      if ("theta" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,5)!="theta"] }
+      if ("aic" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="AIC"] }
+      if ("bic" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="BIC"] }
+      if ("ubre" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="UBRE"] }
+      if ("rho" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,3)!="rho"] }
+      if ("mills" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,5)!="Mills"] }
+      if ("ser" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,3)!="SER"] }
+      if ("f" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,11)!="F statistic"] }
+      if ("chi2" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,4)!="chi2"] }
+      if ("wald" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,4)!="Wald"] }
+      if ("lr" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,2)!="LR"] }
+      if ("logrank" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,7)!="logrank"] }
+      if ("null.dev" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,13)!="null deviance"] }
+      if ("res.dev" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,17)!="residual deviance"] }
     }
     
     # keep statistics in the table
@@ -867,27 +872,27 @@ stargazer <-
       .lower.omit.stat <- c("n","rsq","adj.rsq","max.rsq","ll","aic","bic","scale","ubre","rho","Mills","sigma2","ser","f","theta","chi2","wald","lr","logrank","null.dev","res.dev")
       .lower.omit.stat <- .lower.omit.stat[!(.lower.omit.stat %in% .lower.keep.stat) ]
       
-      if ("n" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="N"] }
-      if ("rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="R-squared"] }
-      if ("adj.rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="adjusted R-squared"] }
-      if ("max.rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="max R-squared"] }
-      if ("ll" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="log likelihood"] }
-      if ("scale" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="scale"] }
-      if ("sigma2" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="sigma2"] }        
-      if ("theta" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,5)!="theta"] }
-      if ("aic" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="AIC"] }
-      if ("bic" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="BIC"] }
-      if ("ubre" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="UBRE"] }
-      if ("rho" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,3)!="rho"] }
-      if ("mills" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,5)!="Mills"] }
-      if ("ser" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,3)!="SER"] }
-      if ("f" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,11)!="F statistic"] }
-      if ("chi2" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,4)!="chi2"] }
-      if ("wald" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,4)!="Wald"] }
-      if ("lr" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,2)!="LR"] }
-      if ("logrank" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,7)!="logrank"] }
-      if ("null.dev" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,13)!="null deviance"] }
-      if ("res.dev" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,17)!="residual deviance"] }
+      if ("n" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="N"] }
+      if ("rsq" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="R-squared"] }
+      if ("adj.rsq" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="adjusted R-squared"] }
+      if ("max.rsq" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="max R-squared"] }
+      if ("ll" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="log likelihood"] }
+      if ("scale" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="scale"] }
+      if ("sigma2" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="sigma2"] }        
+      if ("theta" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,5)!="theta"] }
+      if ("aic" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="AIC"] }
+      if ("bic" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="BIC"] }
+      if ("ubre" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="UBRE"] }
+      if ("rho" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,3)!="rho"] }
+      if ("mills" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,5)!="Mills"] }
+      if ("ser" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,3)!="SER"] }
+      if ("f" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,11)!="F statistic"] }
+      if ("chi2" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,4)!="chi2"] }
+      if ("wald" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,4)!="Wald"] }
+      if ("lr" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,2)!="LR"] }
+      if ("logrank" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,7)!="logrank"] }
+      if ("null.dev" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,13)!="null deviance"] }
+      if ("res.dev" %in% .lower.omit.stat) { fmt$table.parts <- fmt$table.parts[substr(fmt$table.parts,1,17)!="residual deviance"] }
     }
     
     # keep statistics in table parts
@@ -895,226 +900,226 @@ stargazer <-
       .lower.keep.stat <- tolower(keep.stat)    # make it all lower-case
       keep.stat.acceptable <- c("all","n","rsq","adj.rsq","max.rsq","ll","aic","bic","scale","ubre","rho(se)*","Mills(se)*","sigma2","ser","f","theta","chi2","wald","lr","logrank","null.dev","res.dev")     # list of statistic codes that are acceptable
       remove.stats <- keep.stat.acceptable[!(keep.stat.acceptable %in% .lower.keep.stat)]
-      .format.table.parts <- .format.table.parts[!(.format.table.parts %in% remove.stats)]
+      fmt$table.parts <- fmt$table.parts[!(fmt$table.parts %in% remove.stats)]
     }
     
     # digits, initial.zeros, decimal characters
-    if (!is.null(decimal.mark)) { .format.decimal.character <- decimal.mark }
-    if (!is.null(align)) { .format.dec.mark.align <- align }
-    if (!is.null(digit.separator)) { .format.digit.separator <- digit.separator }
-    if (!is.null(initial.zero)) { .format.initial.zero <- initial.zero }
+    if (!is.null(decimal.mark)) { fmt$decimal.character <- decimal.mark }
+    if (!is.null(align)) { fmt$dec.mark.align <- align }
+    if (!is.null(digit.separator)) { fmt$digit.separator <- digit.separator }
+    if (!is.null(initial.zero)) { fmt$initial.zero <- initial.zero }
     
     if (!is.null(digit.separate)) { 
-      if (digit.separate=="lakh") { .format.digit.separator.where <- c(3,2) }  # lakhs 
-      else if ((digit.separate=="china") | (digit.separate=="japan")) { .format.digit.separator.where <- 4 }
-      else { .format.digit.separator.where <- digit.separate}
+      if (digit.separate=="lakh") { fmt$digit.separator.where <- c(3,2) }  # lakhs 
+      else if ((digit.separate=="china") | (digit.separate=="japan")) { fmt$digit.separator.where <- 4 }
+      else { fmt$digit.separator.where <- digit.separate}
     }
     
     if (!is.null(digits)) { 
-      .format.round.digits <- digits 
-      .format.s.round.digits <- digits
+      fmt$round.digits <- digits 
+      fmt$s.round.digits <- digits
     }
     
     if (!is.null(digits.extra)) { 
-      .format.max.extra.digits <- digits.extra
-      if (digits.extra>=1) { .format.until.nonzero.digit <- TRUE }
-      else ( .format.until.nonzero.digit <- FALSE )
+      fmt$max.extra.digits <- digits.extra
+      if (digits.extra>=1) { fmt$until.nonzero.digit <- TRUE }
+      else ( fmt$until.nonzero.digit <- FALSE )
     }
     
     # intercept top and bottom
-    if (!is.null(intercept.top)) { .format.intercept.top <- intercept.top }
-    if (!is.null(intercept.bottom)) { .format.intercept.bottom <- intercept.bottom }
+    if (!is.null(intercept.top)) { fmt$intercept.top <- intercept.top }
+    if (!is.null(intercept.bottom)) { fmt$intercept.bottom <- intercept.bottom }
     
     # model names, numbers and multicolumn
     if (!is.null(model.names)) { 
-      .format.model.names.include <- model.names 
-      if (model.names == TRUE) { .format.models.skip.if.one <- FALSE }
+      fmt$model.names.include <- model.names 
+      if (model.names == TRUE) { fmt$models.skip.if.one <- FALSE }
     }    
-    if (!is.null(model.numbers)) { .format.model.numbers <- model.numbers }
-    .format.multicolumn <- multicolumn
+    if (!is.null(model.numbers)) { fmt$model.numbers <- model.numbers }
+    fmt$multicolumn <- multicolumn
     
     # object names
-    .format.object.names <- object.names
+    fmt$object.names <- object.names
     
     # report coefs, std errs, t, p?
     if (!is.null(report)) {
-      .format.coefficient.table.parts <- NULL
+      fmt$coefficient.table.parts <- NULL
       for (i in 1:nchar(report)) {
         component.letter <- substr(report, i, i)
-        if (component.letter == "v") { .format.coefficient.table.parts <- append(.format.coefficient.table.parts, "variable name") }
-        if (component.letter == "c") { .format.coefficient.table.parts <- append(.format.coefficient.table.parts, "coefficient") }
-        if (component.letter == "s") { .format.coefficient.table.parts <- append(.format.coefficient.table.parts, "standard error") }
-        if (component.letter == "t") { .format.coefficient.table.parts <- append(.format.coefficient.table.parts, "t-stat") }
-        if (component.letter == "p") { .format.coefficient.table.parts <- append(.format.coefficient.table.parts, "p-value") }
+        if (component.letter == "v") { fmt$coefficient.table.parts <- append(fmt$coefficient.table.parts, "variable name") }
+        if (component.letter == "c") { fmt$coefficient.table.parts <- append(fmt$coefficient.table.parts, "coefficient") }
+        if (component.letter == "s") { fmt$coefficient.table.parts <- append(fmt$coefficient.table.parts, "standard error") }
+        if (component.letter == "t") { fmt$coefficient.table.parts <- append(fmt$coefficient.table.parts, "t-stat") }
+        if (component.letter == "p") { fmt$coefficient.table.parts <- append(fmt$coefficient.table.parts, "p-value") }
         if ((component.letter == "*") & (i > 1)) { 
-          l <- length(.format.coefficient.table.parts)
-          if ((.format.coefficient.table.parts[l] != "variable name") & (substr(report,i-1,i-1) != "*")) {
-            .format.coefficient.table.parts[l] <- paste(.format.coefficient.table.parts[l],"*",sep="")
+          l <- length(fmt$coefficient.table.parts)
+          if ((fmt$coefficient.table.parts[l] != "variable name") & (substr(report,i-1,i-1) != "*")) {
+            fmt$coefficient.table.parts[l] <- paste(fmt$coefficient.table.parts[l],"*",sep="")
           }
         }
       }
-      .format.coefficient.table.parts <- append(.format.coefficient.table.parts, " ")
+      fmt$coefficient.table.parts <- append(fmt$coefficient.table.parts, " ")
     }
     
     
     # significance stars
     if (!is.null(star.cutoffs)) { 
       # assign cutoff values
-      .format.cutoffs <- star.cutoffs
+      fmt$cutoffs <- star.cutoffs
     }
     
     if (!is.null(star.char)) { 
-      .format.stars <- star.char
+      fmt$stars <- star.char
     }
     
-    for (i in 1:length(.format.cutoffs)) {
-      if (is.na(.format.stars[i])) {
-        .format.stars[i] <- paste(rep(.format.stars[1], i), sep="", collapse="")
+    for (i in 1:length(fmt$cutoffs)) {
+      if (is.na(fmt$stars[i])) {
+        fmt$stars[i] <- paste(rep(fmt$stars[1], i), sep="", collapse="")
       }  
     }
-    .format.stars <- .format.stars[1:length(.format.cutoffs)]
+    fmt$stars <- fmt$stars[1:length(fmt$cutoffs)]
     
     # selection equation
-    .global.sel.equation <- selection.equation
+    gbl$sel.equation <- selection.equation
     
     # colnames and rownames
-    if (!is.null(rownames)) { .format.rownames <- rownames }
-    if (!is.null(colnames)) { .format.colnames <- colnames }
+    if (!is.null(rownames)) { fmt$rownames <- rownames }
+    if (!is.null(colnames)) { fmt$colnames <- colnames }
     
     # zero vs. count component
-    .global.zero.component <- zero.component
+    gbl$zero.component <- zero.component
     
     # notes
     
     
     # replace star cutoffs in the notes section
-    for (i in 1:length(.format.cutoffs)) {
-      if (!is.na(.format.stars[i])) {
+    for (i in 1:length(fmt$cutoffs)) {
+      if (!is.na(fmt$stars[i])) {
         star.string <- paste(rep("*", i), sep="", collapse="")
-        .format.note.content <- gsub(paste("[.",star.string,"]",sep=""), replace.dec.mark(gsub("^[0]+", "",.format.cutoffs[i])), .format.note.content, fixed=TRUE)  
-        .format.note.content <- gsub(paste("[0.",star.string,"]",sep=""), replace.dec.mark(.format.cutoffs[i]), .format.note.content, fixed=TRUE)
-        .format.note.content <- gsub(paste("[",star.string,"]",sep=""), replace.dec.mark(.format.cutoffs[i]*100), .format.note.content, fixed=TRUE)        
+        fmt$note.content <- gsub(paste("[.",star.string,"]",sep=""), replace.dec.mark(gsub("^[0]+", "",fmt$cutoffs[i])), fmt$note.content, fixed=TRUE)  
+        fmt$note.content <- gsub(paste("[0.",star.string,"]",sep=""), replace.dec.mark(fmt$cutoffs[i]), fmt$note.content, fixed=TRUE)
+        fmt$note.content <- gsub(paste("[",star.string,"]",sep=""), replace.dec.mark(fmt$cutoffs[i]*100), fmt$note.content, fixed=TRUE)        
       }
     }
     
     
     if (!is.null(notes)) { 
       if (notes.append == TRUE) {
-        .format.note.content <- c(.format.note.content, notes)
-        .format.s.note.content <- c(.format.s.note.content, notes)
+        fmt$note.content <- c(fmt$note.content, notes)
+        fmt$s.note.content <- c(fmt$s.note.content, notes)
       }
       else {
-        .format.note.content <- notes
-        .format.s.note.content <- notes
+        fmt$note.content <- notes
+        fmt$s.note.content <- notes
       }
     }
     if (!is.null(notes.align)) { 
-      .format.note.alignment <- notes.align 
-      .format.s.note.alignment <- notes.align
+      fmt$note.alignment <- notes.align 
+      fmt$s.note.alignment <- notes.align
     }
     
     if (!is.null(notes.label)) { 
-      .format.note <- notes.label
-      .format.s.note <- notes.label
+      fmt$note <- notes.label
+      fmt$s.note <- notes.label
     }    
     
     # ordered probit/logit, etc. - report intercepts?
-    .format.ordered.intercepts <- ord.intercepts
+    fmt$ordered.intercepts <- ord.intercepts
     
     # perl-compatible regular expressions?
-    .format.perl <- perl
+    fmt$perl <- perl
     
     # standard error for quantile regression
-    .format.rq.se <- rq.se
+    fmt$rq.se <- rq.se
     
     # report logical variables in summary statistics tables?
-    .format.summ.logical <- summary.logical
+    fmt$summ.logical <- summary.logical
     
     # summary statistics - what statistics to report - !!! this needs to come before summary.stat and omit.summary.stat
-    if (!nobs) { .format.s.statistics.list <- .format.s.statistics.list[.format.s.statistics.list!="n"] }
-    if (!mean.sd) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="mean")&(.format.s.statistics.list!="sd")]}
-    if (!min.max) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="min")&(.format.s.statistics.list!="max")]}
-    if (!median) { .format.s.statistics.list <- .format.s.statistics.list[.format.s.statistics.list!="median"] }
-    if (!iqr) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="p25")&(.format.s.statistics.list!="p75")]}
+    if (!nobs) { fmt$s.statistics.list <- fmt$s.statistics.list[fmt$s.statistics.list!="n"] }
+    if (!mean.sd) { fmt$s.statistics.list <- fmt$s.statistics.list[(fmt$s.statistics.list!="mean")&(fmt$s.statistics.list!="sd")]}
+    if (!min.max) { fmt$s.statistics.list <- fmt$s.statistics.list[(fmt$s.statistics.list!="min")&(fmt$s.statistics.list!="max")]}
+    if (!median) { fmt$s.statistics.list <- fmt$s.statistics.list[fmt$s.statistics.list!="median"] }
+    if (!iqr) { fmt$s.statistics.list <- fmt$s.statistics.list[(fmt$s.statistics.list!="p25")&(fmt$s.statistics.list!="p75")]}
     
     # keep summary statistics
     if (!is.null(summary.stat)) {
       .lower.keep.summary.stat <- tolower(summary.stat)    # make it all lower-case
-      .format.s.statistics.list <- .lower.keep.summary.stat
+      fmt$s.statistics.list <- .lower.keep.summary.stat
     } 
     
     # remove omitted statistics from table parts
     if (!is.null(omit.summary.stat)) {
       .lower.omit.summary.stat <- tolower(omit.summary.stat)    # make it all lower-case
-      .format.s.statistics.list <- .format.s.statistics.list[!(.format.s.statistics.list %in% .lower.omit.summary.stat)]
+      fmt$s.statistics.list <- fmt$s.statistics.list[!(fmt$s.statistics.list %in% .lower.omit.summary.stat)]
     }
     
     # table layout
-    .format.table.parts.nonstat <- c("=","-","-!","=!","dependent variable label",
+    fmt$table.parts.nonstat <- c("=","-","-!","=!","dependent variable label",
                                      "dependent variables","models","columns","numbers",
                                      "objects","coefficients","omit","additional","notes")  
     # these are the non-model statistics parts of the table
     
     if (!is.null(table.layout)) {
-      .format.table.parts.new <- NULL
+      fmt$table.parts.new <- NULL
       for (i in 1:nchar(table.layout)) {
         component.letter <- substr(table.layout, i, i)
-        if (component.letter == "=") { .format.table.parts.new <- append(.format.table.parts.new, "=") }
-        if (component.letter == "-") { .format.table.parts.new <- append(.format.table.parts.new, "-") }
+        if (component.letter == "=") { fmt$table.parts.new <- append(fmt$table.parts.new, "=") }
+        if (component.letter == "-") { fmt$table.parts.new <- append(fmt$table.parts.new, "-") }
         if ((component.letter == "!") & (i > 1)) { 
-          if (.format.table.parts.new[i-1] %in% c("-","=")) {
-            .format.table.parts.new[i-1] <- paste(.format.table.parts.new[i-1], "!", sep="")
+          if (fmt$table.parts.new[i-1] %in% c("-","=")) {
+            fmt$table.parts.new[i-1] <- paste(fmt$table.parts.new[i-1], "!", sep="")
           }
         }
-        if (component.letter == "l") { .format.table.parts.new <- append(.format.table.parts.new, "dependent variable label") }
-        if (component.letter == "d") { .format.table.parts.new <- append(.format.table.parts.new, "dependent variables") }
+        if (component.letter == "l") { fmt$table.parts.new <- append(fmt$table.parts.new, "dependent variable label") }
+        if (component.letter == "d") { fmt$table.parts.new <- append(fmt$table.parts.new, "dependent variables") }
         if (component.letter == "m") { 
-          .format.table.parts.new <- append(.format.table.parts.new, "models") 
-          .format.model.names.include <- TRUE 
+          fmt$table.parts.new <- append(fmt$table.parts.new, "models") 
+          fmt$model.names.include <- TRUE 
         }
-        if (component.letter == "c") { .format.table.parts.new <- append(.format.table.parts.new, "columns") }
+        if (component.letter == "c") { fmt$table.parts.new <- append(fmt$table.parts.new, "columns") }
         if (component.letter == "#") { 
-          .format.table.parts.new <- append(.format.table.parts.new, "numbers")
-          .format.model.numbers <- TRUE
+          fmt$table.parts.new <- append(fmt$table.parts.new, "numbers")
+          fmt$model.numbers <- TRUE
         }  
         if (component.letter == "b") { 
-          .format.table.parts.new <- append(.format.table.parts.new, "objects") 
-          .format.object.names <- TRUE
+          fmt$table.parts.new <- append(fmt$table.parts.new, "objects") 
+          fmt$object.names <- TRUE
         }  
-        if (component.letter == "t") { .format.table.parts.new <- append(.format.table.parts.new, "coefficients") }  
-        if (component.letter == "o") { .format.table.parts.new <- append(.format.table.parts.new, "omit") }  
-        if (component.letter == "a") { .format.table.parts.new <- append(.format.table.parts.new, "additional") }  
-        if (component.letter == "n") { .format.table.parts.new <- append(.format.table.parts.new, "notes") }  
+        if (component.letter == "t") { fmt$table.parts.new <- append(fmt$table.parts.new, "coefficients") }  
+        if (component.letter == "o") { fmt$table.parts.new <- append(fmt$table.parts.new, "omit") }  
+        if (component.letter == "a") { fmt$table.parts.new <- append(fmt$table.parts.new, "additional") }  
+        if (component.letter == "n") { fmt$table.parts.new <- append(fmt$table.parts.new, "notes") }  
         if (component.letter == "s") { 
-          .format.table.parts.new <- append(.format.table.parts.new, 
-                                            .format.table.parts[!(.format.table.parts %in% .format.table.parts.nonstat)]) 
+          fmt$table.parts.new <- append(fmt$table.parts.new, 
+                                            fmt$table.parts[!(fmt$table.parts %in% fmt$table.parts.nonstat)]) 
         }
         
       }
-      .format.table.parts <- .format.table.parts.new
+      fmt$table.parts <- fmt$table.parts.new
     }
     
     # now omit table parts
     if (!is.null(omit.table.layout)) {
       for (i in 1:nchar(omit.table.layout)) {
         component.letter <- substr(omit.table.layout, i, i)
-        if (component.letter == "=") { .format.table.parts <- .format.table.parts[.format.table.parts!="="] }
-        if (component.letter == "-") { .format.table.parts <- .format.table.parts[.format.table.parts!="-"] }
+        if (component.letter == "=") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="="] }
+        if (component.letter == "-") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="-"] }
         if ((component.letter == "!") & (i > 1)) {
-          if (substr(omit.table.layout, i-1, i-1) == "=") { .format.table.parts <- .format.table.parts[.format.table.parts!="=!"] }
-          if (substr(omit.table.layout, i-1, i-1) == "-") { .format.table.parts <- .format.table.parts[.format.table.parts!="-!"] }
+          if (substr(omit.table.layout, i-1, i-1) == "=") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="=!"] }
+          if (substr(omit.table.layout, i-1, i-1) == "-") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="-!"] }
         }
-        if (component.letter == "l") { .format.table.parts <- .format.table.parts[.format.table.parts!="dependent variable label"] }
-        if (component.letter == "d") { .format.table.parts <- .format.table.parts[.format.table.parts!="dependent variables"] }
-        if (component.letter == "m") { .format.table.parts <- .format.table.parts[.format.table.parts!="models"] }
-        if (component.letter == "c") { .format.table.parts <- .format.table.parts[.format.table.parts!="columns"] }
-        if (component.letter == "#") { .format.table.parts <- .format.table.parts[.format.table.parts!="numbers"] }
-        if (component.letter == "b") { .format.table.parts <- .format.table.parts[.format.table.parts!="objects"] }
-        if (component.letter == "t") { .format.table.parts <- .format.table.parts[.format.table.parts!="coefficients"] }
-        if (component.letter == "o") { .format.table.parts <- .format.table.parts[.format.table.parts!="omit"] }
-        if (component.letter == "a") { .format.table.parts <- .format.table.parts[.format.table.parts!="additional"] }
-        if (component.letter == "n") { .format.table.parts <- .format.table.parts[.format.table.parts!="notes"] }
-        if (component.letter == "s") { .format.table.parts <- .format.table.parts[.format.table.parts %in% .format.table.parts.nonstat] }          
+        if (component.letter == "l") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="dependent variable label"] }
+        if (component.letter == "d") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="dependent variables"] }
+        if (component.letter == "m") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="models"] }
+        if (component.letter == "c") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="columns"] }
+        if (component.letter == "#") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="numbers"] }
+        if (component.letter == "b") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="objects"] }
+        if (component.letter == "t") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="coefficients"] }
+        if (component.letter == "o") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="omit"] }
+        if (component.letter == "a") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="additional"] }
+        if (component.letter == "n") { fmt$table.parts <- fmt$table.parts[fmt$table.parts!="notes"] }
+        if (component.letter == "s") { fmt$table.parts <- fmt$table.parts[fmt$table.parts %in% fmt$table.parts.nonstat] }          
       }
     }
     
@@ -1129,11 +1134,11 @@ stargazer <-
         if (!is.null(regression.table.objects)) { 
           number.of.table <- number.of.table + 1    # allows for multiple table titles and labels
           
-          if (!is.na(title[number.of.table])) { .format.title <- title[number.of.table] }
-          else { .format.title <- title[length(title)] }
+          if (!is.na(title[number.of.table])) { fmt$title <- title[number.of.table] }
+          else { fmt$title <- title[length(title)] }
           
-          if (!is.na(label[number.of.table])) { .format.label <- label[number.of.table] }
-          else { .format.label <- label[length(label)] }
+          if (!is.na(label[number.of.table])) { fmt$label <- label[number.of.table] }
+          else { fmt$label <- label[length(label)] }
           
           if (type == "latex") {
             do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
@@ -1145,13 +1150,13 @@ stargazer <-
         }
         
         number.of.table <- number.of.table + 1
-        if (!is.na(title[number.of.table])) { .format.title <- title[number.of.table] }
-        else { .format.title <- title[length(title)] }
+        if (!is.na(title[number.of.table])) { fmt$title <- title[number.of.table] }
+        else { fmt$title <- title[length(title)] }
         
-        if (!is.na(label[number.of.table])) { .format.label <- label[number.of.table] }
-        else { .format.label <- label[length(label)] }
+        if (!is.na(label[number.of.table])) { fmt$label <- label[number.of.table] }
+        else { fmt$label <- label[length(label)] }
         
-        if (.global.summary[i]==TRUE) {
+        if (gbl$summary[i]==TRUE) {
           if (type == "latex") {
             .stargazer.summ.stat.table(objects[[i]])
             invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
@@ -1173,17 +1178,17 @@ stargazer <-
       }
       else {
         regression.table.objects <- c(regression.table.objects, i)
-        .global.object.names <- .global.object.names.all[regression.table.objects]
+        gbl$object.names <- gbl$object.names.all[regression.table.objects]
       }
     }
     
     if (!is.null(regression.table.objects)) {	
       number.of.table <- number.of.table + 1
-      if (!is.na(title[number.of.table])) { .format.title <- title[number.of.table] }
-      else { .format.title <- title[length(title)] }
+      if (!is.na(title[number.of.table])) { fmt$title <- title[number.of.table] }
+      else { fmt$title <- title[length(title)] }
       
-      if (!is.na(label[number.of.table])) { .format.label <- label[number.of.table] }
-      else { .format.label <- label[length(label)] }
+      if (!is.na(label[number.of.table])) { fmt$label <- label[number.of.table] }
+      else { fmt$label <- label[length(label)] }
       
       if (type == "latex") {
         do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
