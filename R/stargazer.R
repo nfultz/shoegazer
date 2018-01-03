@@ -19,8 +19,9 @@ function(..., type = "latex", title="", style="default", summary=NULL, out=NULL,
          summary.logical=TRUE, summary.stat=NULL, nobs=TRUE, mean.sd=TRUE, min.max=TRUE, median=FALSE, 
          iqr=FALSE) {
   
-  save.warn.option <- getOption("warn") 
-  options(warn=-1)
+  o <- options("warn") 
+  on.exit(options(o))
+  
   return(.stargazer.wrap(..., type=type, title=title, style=style, summary=summary, out=out, out.header=out.header,
                          column.labels=column.labels, column.separate = column.separate,
                          covariate.labels=covariate.labels, dep.var.caption = dep.var.caption,
