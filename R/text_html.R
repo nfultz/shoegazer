@@ -6,7 +6,7 @@
     s <- gsub("\\\\", "", s, fixed=TRUE)
     s <- paste("  ",s,"  ", sep="")
     
-    return(.trim(strsplit(s, " &", fixed=TRUE)[[1]]))
+    return(trimws(strsplit(s, " &", fixed=TRUE)[[1]]))
   }
 
 .remove.extra.spaces <-
@@ -196,7 +196,7 @@ is.alphanumeric <-
     new.s <- gsub("\\_", "_", new.s, fixed=T)
     new.s <- gsub("\\^", "^", new.s, fixed=T)
     
-    return(.trim(new.s))
+    return(trimws(new.s))
     
   }
 
@@ -304,8 +304,8 @@ is.alphanumeric <-
           .text.output.line(t, r, w, c, j)
         }
         else if (strpos("\\caption{", line) != -1) {
-          inside.caption <- substr(.trim(line), 10, nchar(.trim(line))-1)
-          text.title <- .trim(.remove.control.sequences(inside.caption))
+          inside.caption <- substr(trimws(line), 10, nchar(trimws(line))-1)
+          text.title <- trimws(.remove.control.sequences(inside.caption))
           if (text.title != "") { cat(.remove.control.sequences(inside.caption),"\n", sep="") }
         }
         else if (strpos("\\cline{", line) != -1) {
@@ -393,8 +393,8 @@ is.alphanumeric <-
           .html.output.line(t, r, w, c, j)
         }
         else if (strpos("\\caption{", line) != -1) {
-          inside.caption <- substr(.trim(line), 10, nchar(.trim(line))-1)
-          text.title <- .trim(.remove.control.sequences(inside.caption, type="html"))
+          inside.caption <- substr(trimws(line), 10, nchar(trimws(line))-1)
+          text.title <- trimws(.remove.control.sequences(inside.caption, type="html"))
           if (text.title != "") { cat("<caption><strong>",.remove.control.sequences(inside.caption, type="html"),"</strong></caption>\n", sep="") }
         }
         else if (strpos("\\cline{", line) != -1) {
@@ -482,8 +482,8 @@ is.alphanumeric <-
           .mmd.output.line(t, r, w, c, j)
         }
         else if (strpos("\\caption{", line) != -1) {
-          inside.caption <- substr(.trim(line), 10, nchar(.trim(line))-1)
-          text.title <- .trim(.remove.control.sequences(inside.caption, type="mmd"))
+          inside.caption <- substr(trimws(line), 10, nchar(trimws(line))-1)
+          text.title <- trimws(.remove.control.sequences(inside.caption, type="mmd"))
           if (text.title != "") { cat("**",.remove.control.sequences(inside.caption, type="mmd"),"***\n", sep="") }
           ### ADD THE REQUISITE NUMBER OF |s
         }

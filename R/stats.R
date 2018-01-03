@@ -1885,7 +1885,7 @@
     if (model.name %in% c("gmm")) {
       formula <- object.name$call[2]
       position <- regexpr("~", formula, fixed=T)
-      return( .trim(substr(formula, 1, position-1)) )
+      return( trimws(substr(formula, 1, position-1)) )
     }
     if (model.name %in% c("selection","heckit")) {
       if (!.global.sel.equation) {
@@ -1895,12 +1895,12 @@
         formula <- object.name$call["selection"]    ### outcome
       }
       position <- regexpr("~", formula, fixed=T)
-      return( .trim(substr(formula, 1, position-1)))
+      return( trimws(substr(formula, 1, position-1)))
     }
     if (model.name %in% c("probit.ss","binaryChoice")) {
       formula <- object.name$call["formula"]
       position <- regexpr("~", formula, fixed=T)
-      return( .trim(substr(formula, 1, position-1)))
+      return( trimws(substr(formula, 1, position-1)))
     }
     if (model.name %in% c("maBina")) {
       object.name <- object.name$w

@@ -305,9 +305,6 @@ is.wholenumber <-
     }
   }
 
-.trim <-
-  function (x) gsub("^\\s+|\\s+$", "", x)
-
 
 
 .apply <-
@@ -351,7 +348,7 @@ is.wholenumber <-
       else { break } 
     }
     if (process.string != "") { return.vector <- c(return.vector, process.string) }
-    return (.trim(return.vector))
+    return (trimws(return.vector))
   }
 
 .rename.intercept <-
