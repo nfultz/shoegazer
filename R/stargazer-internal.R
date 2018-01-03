@@ -5,26 +5,29 @@ function(libname, pkgname) {
   packageStartupMessage(" R package version 5.2. http://CRAN.R-project.org/package=stargazer \n")
 }
 
-.stargazer.wrap <-
-  function(..., type, title, style, summary, out, out.header, covariate.labels, column.labels, column.separate, 
-           dep.var.caption, dep.var.labels, dep.var.labels.include, align, coef, se, t, p, t.auto, 
-           p.auto, ci, ci.custom, ci.level, ci.separator, add.lines, apply.coef, apply.se, apply.t, apply.p, apply.ci,
-           colnames,
-           column.sep.width, decimal.mark, df, digit.separate, digit.separator, digits, digits.extra, 
-           flip, float, 
-           float.env, font.size, header, initial.zero, intercept.bottom, intercept.top, keep, keep.stat, 
-           label, model.names, model.numbers, multicolumn, no.space, notes, notes.align, notes.append, 
-           notes.label, object.names, omit, omit.labels, omit.stat, omit.summary.stat, omit.table.layout,
-           omit.yes.no, order, ord.intercepts, perl, report, rownames,
-           rq.se, selection.equation, single.row, star.char, star.cutoffs, suppress.errors, 
-           table.layout, table.placement, 
-           zero.component, summary.logical, summary.stat, nobs, mean.sd, min.max, median, iqr) {
+stargazer <-
+  function(..., type = "latex", title="", style="default", summary=NULL, out=NULL, out.header=FALSE,
+           column.labels=NULL, column.separate = NULL, covariate.labels=NULL, dep.var.caption=NULL, 
+           dep.var.labels=NULL, dep.var.labels.include=TRUE, align=FALSE, coef=NULL, se=NULL, t=NULL, 
+           p=NULL,  t.auto=TRUE, p.auto=TRUE, ci=FALSE, ci.custom=NULL, ci.level=0.95, ci.separator=NULL, 
+           add.lines=NULL, apply.coef=NULL, apply.se=NULL, apply.t=NULL, apply.p=NULL, apply.ci=NULL, 
+           colnames = NULL, column.sep.width = "5pt", 
+           decimal.mark=NULL, df=TRUE, digit.separate=NULL, digit.separator=NULL, digits=NULL, digits.extra=NULL, 
+           flip=FALSE,
+           float=TRUE, float.env="table", font.size=NULL, header=TRUE, initial.zero=NULL, intercept.bottom=TRUE, 
+           intercept.top=FALSE, keep=NULL, keep.stat=NULL, label="", model.names=NULL, model.numbers=NULL, 
+           multicolumn=TRUE, no.space=NULL, notes=NULL, notes.align=NULL, notes.append=TRUE, notes.label=NULL, 
+           object.names=FALSE,
+           omit=NULL, omit.labels=NULL, omit.stat=NULL, omit.summary.stat=NULL, omit.table.layout=NULL,
+           omit.yes.no=c("Yes","No"), order=NULL, ord.intercepts=FALSE, 
+           perl=FALSE, report=NULL, rownames = NULL,
+           rq.se = "nid", selection.equation=FALSE, single.row=FALSE, star.char=NULL, 
+           star.cutoffs=NULL, suppress.errors=FALSE, table.layout=NULL, table.placement = "!htbp", zero.component=FALSE, 
+           summary.logical=TRUE, summary.stat=NULL, nobs=TRUE, mean.sd=TRUE, min.max=TRUE, median=FALSE, 
+           iqr=FALSE) {
   
-  
-############## TEXT AND html MODE ##############
-
-  
-  
+    o <- options("warn") 
+    on.exit(options(o))  
 
 ###########################################
 
