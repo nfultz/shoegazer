@@ -22,7 +22,7 @@ function(..., type = "latex", title="", style="default", summary=NULL, out=NULL,
   o <- options("warn") 
   on.exit(options(o))
   
-  return(.stargazer.wrap(..., type=type, title=title, style=style, summary=summary, out=out, out.header=out.header,
+  .stargazer.wrap(..., type=type, title=title, style=style, summary=summary, out=out, out.header=out.header,
                          column.labels=column.labels, column.separate = column.separate,
                          covariate.labels=covariate.labels, dep.var.caption = dep.var.caption,
                          dep.var.labels=dep.var.labels, dep.var.labels.include=dep.var.labels.include,
@@ -55,5 +55,5 @@ function(..., type = "latex", title="", style="default", summary=NULL, out=NULL,
                          summary.logical = summary.logical,
                          summary.stat = summary.stat,
                          nobs=nobs, mean.sd=mean.sd, 
-                         min.max=min.max, median=median, iqr=iqr, warn=save.warn.option))
+                         min.max=min.max, median=median, iqr=iqr)
 }
