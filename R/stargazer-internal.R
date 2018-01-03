@@ -983,7 +983,6 @@ function(libname, pkgname) {
     
     # notes
     
-    replace.dec.mark <- function(s) { return (gsub(".", .format.decimal.character, s, fixed=TRUE))}
     
     # replace star cutoffs in the notes section
     for (i in 1:length(.format.cutoffs)) {

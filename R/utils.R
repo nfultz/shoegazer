@@ -531,3 +531,6 @@ is.wholenumber <-
     }
     .table.part.published[part.number] <<- TRUE
   }
+
+
+replace.dec.mark <- function(s) { return (gsub(".", .format.decimal.character, s, fixed=TRUE))}
