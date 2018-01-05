@@ -358,7 +358,7 @@
 
 
 .null.deviance <-
-  function(object.name) {
+  function(object.name, .summary.object) {
     null.deviance.output <- as.vector(rep(NA,times=3))
     
     model.name <- .get.model.name(object.name)

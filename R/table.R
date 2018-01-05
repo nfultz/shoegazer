@@ -112,7 +112,7 @@
       gbl$wald.stat <- cbind(suppressMessages(.wald.stat(object.name)))
       gbl$lr.stat <- cbind(suppressMessages(.lr.stat(object.name)))
       gbl$logrank.stat <- cbind(suppressMessages(.logrank.stat(object.name)))
-      gbl$null.deviance <- cbind(suppressMessages(.null.deviance(object.name)))
+      gbl$null.deviance <- cbind(suppressMessages(.null.deviance(object.name, .summary.object)))
       gbl$residual.deviance <- cbind(suppressMessages(.residual.deviance(object.name)))
     }
     
@@ -1210,8 +1210,8 @@
 
 
 .data.frame.table.header <-
-  function(object) {
-    .floating.header()
+  function(object, fmt) {
+    .floating.header(fmt)
     
     .formatting.alignment <- paste("@{\\extracolsep{",fmt$column.sep.width,"}} ", sep="")
     for (i in seq(1:(length(names(object))))) {
@@ -1228,7 +1228,7 @@
   }
 
 .stargazer.data.frame.table <-
-  function(object) {  
+  function(object, fmt, gbl) {  
     
     # flip objects
     if (fmt$flip == TRUE) { 
@@ -1247,20 +1247,20 @@
       cat("% Error: Data frame must have at least one row and one column.\n")
     }
     else {
-      object <- .order.data.frame(object, order)
+      object <- .order.data.frame(object, gbl$order,  summary=FALSE, fmt.rownames=fmt$rownames, fmt.perl=fmt$perl)
       
-      .table.info.comment()
+      .table.info.comment(fmt, gbl)
       
       #create table header
-      .data.frame.table.header(object)
-      .table.insert.space()
+      .data.frame.table.header(object, fmt)
+      .table.insert.space(fmt)
       
       .table.part.published <<- as.vector(rep(NA, times=length(fmt$s.stat.parts)))    # to keep track what has been published (to deal intelligently with horizontal lines)
       .publish.horizontal.line <<- TRUE   # should non-compulsory horizontal lines be published? (yes, if something else published since the previous line)
       
       if (length(fmt$s.stat.parts)>=1) {
         for (i in seq(1:length(fmt$s.stat.parts))) {
-          .data.frame.table.part(object,fmt$s.stat.parts[i], which.part.number = i)
+          .data.frame.table.part(object,fmt$s.stat.parts[i], which.part.number = i, fmt=fmt)
           
           if (.table.part.published[i]==TRUE) { .publish.horizontal.line <<- TRUE }
           if ((fmt$s.stat.parts[i]=="-") | (fmt$s.stat.parts[i]=="-!") | (fmt$s.stat.parts[i]=="=") | (fmt$s.stat.parts[i]=="=!")) { .publish.horizontal.line <<- FALSE }
@@ -1276,7 +1276,7 @@
   }
 
 .data.frame.table.part <-
-  function(object, part, which.part.number) {
+  function(object, part, which.part.number, fmt) {
     
     .table.part.published[which.part.number] <<- FALSE
     
@@ -1386,7 +1386,7 @@
               
               if (.is.all.integers(object[y,x])) { .how.much.to.round <- 0 }
               
-              rounded.object <- .iround(object[y,x], .how.much.to.round)
+              rounded.object <- .iround(object[y,x], .how.much.to.round, fmt=fmt)
               
               if (fmt$dec.mark.align==TRUE) {
                 cat(rounded.object, sep="")  
@@ -1445,7 +1445,7 @@
     # horizontal line
     else if (part=="-!") {
       cat("\\hline ")
-      .table.insert.space()
+      .table.insert.space(fmt)
       cat(" \n")
       .table.part.published[which.part.number] <<- TRUE
     }
@@ -1453,7 +1453,7 @@
     else if (part=="-") {
       if (.publish.horizontal.line==TRUE) {
         cat("\\hline ")
-        .table.insert.space()
+        .table.insert.space(fmt)
         cat(" \n")
         .table.part.published[which.part.number] <<- TRUE
       }
@@ -1463,7 +1463,7 @@
     else if (part=="=!") {
       cat("\\hline \n") 
       cat("\\hline ")
-      .table.insert.space()
+      .table.insert.space(fmt)
       cat(" \n")
       .table.part.published[which.part.number] <<- TRUE
     }
@@ -1472,7 +1472,7 @@
       if (.publish.horizontal.line==TRUE) {
         cat("\\hline \n") 
         cat("\\hline ")
-        .table.insert.space()
+        .table.insert.space(fmt)
         cat(" \n")
         .table.part.published[which.part.number] <<- TRUE
       }

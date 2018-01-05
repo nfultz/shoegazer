@@ -50,7 +50,7 @@
       gbl$wald.stat <- cbind(gbl$wald.stat, .wald.stat(object.name))
       gbl$lr.stat <- cbind(gbl$lr.stat, .lr.stat(object.name))
       gbl$logrank.stat <- cbind(gbl$logrank.stat, .logrank.stat(object.name))
-      gbl$null.deviance <- cbind(gbl$null.deviance, .null.deviance(object.name))
+      gbl$null.deviance <- cbind(gbl$null.deviance, .null.deviance(object.name, .summary.object))
       gbl$residual.deviance <- cbind(gbl$residual.deviance, .residual.deviance(object.name))
       
       max.length <- length(gbl$coefficient.variables)+length(.coefficient.variables(object.name))

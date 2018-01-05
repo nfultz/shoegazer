@@ -1140,11 +1140,11 @@ stargazer <-
         }
         else {
           if (type == "latex") {
-            .stargazer.data.frame.table(objects[[i]])
-            invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(.stargazer.data.frame.table(objects[[i]]),file=NULL)) )
+            .stargazer.data.frame.table(objects[[i]], fmt, gbl)
+            invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(.stargazer.data.frame.table(objects[[i]], fmt, gbl),file=NULL)) )
           }
           else if ((type == "text") | (type == "html") | (type == "mmd")) {
-            latex.code <- c(latex.code, invisible(capture.output(.stargazer.data.frame.table(objects[[i]]),file=NULL)) )
+            latex.code <- c(latex.code, invisible(capture.output(.stargazer.data.frame.table(objects[[i]], fmt, gbl),file=NULL)) )
           }
         }
         regression.table.objects <- NULL
