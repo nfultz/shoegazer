@@ -1978,7 +1978,7 @@
   }
 
 .enter.significance.stars <-
-  function(p.value, force.math=FALSE) {
+  function(p.value, force.math=FALSE, fmt) {
     if ((!is.na(p.value)) & (!is.null(p.value))) {
       
       if (fmt$dec.mark.align == TRUE) {

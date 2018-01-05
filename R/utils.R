@@ -57,7 +57,7 @@
 
 
 .iround <- 
-  function(x, decimal.places=0, round.up.positive=FALSE, simply.output=FALSE) {
+  function(x, decimal.places=0, round.up.positive=FALSE, simply.output=FALSE, fmt) {
     
     x.original <- x
     first.part <- ""
@@ -308,19 +308,21 @@ is.wholenumber <-
 
 
 .apply <-
-  function(auto.t, auto.p)
+  function(gbl)
   {
-    if ((!is.null(apply.coef)) | ((!is.null(apply.se)))) {
-      if (!is.null(apply.coef)) { gbl$coefficients <<- apply(gbl$coefficients, c(1,2), apply.coef) }
-      if (!is.null(apply.se)) { gbl$std.errors <<- apply(gbl$std.errors, c(1,2), apply.se) }
+    if ((!is.null(gbl$apply.coef)) | ((!is.null(gbl$apply.se)))) {
+      if (!is.null(gbl$apply.coef)) { gbl$coefficients <- apply(gbl$coefficients, c(1,2), apply.coef) }
+      if (!is.null(gbl$apply.se)) { gbl$std.errors <- apply(gbl$std.errors, c(1,2), apply.se) }
       
-      if (auto.t == TRUE) { gbl$t.stats <<- gbl$coefficients / gbl$std.errors }
-      if (auto.p == TRUE) { gbl$p.values <<- 2 * pnorm( abs( gbl$t.stats ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) }
+      if (gbl$auto.t == TRUE) { gbl$t.stats <- gbl$coefficients / gbl$std.errors }
+      if (gbl$auto.p == TRUE) { gbl$p.values <- 2 * pnorm( abs( gbl$t.stats ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) }
       
     }
     
-    if (!is.null(apply.t)) { gbl$t.stats <<- apply(gbl$t.stats, c(1,2), apply.t) }
-    if (!is.null(apply.p)) { gbl$p.values <<- apply(gbl$p.values, c(1,2), apply.p) }
+    if (!is.null(gbl$apply.t)) { gbl$t.stats <- apply(gbl$t.stats, c(1,2), gbl$apply.t) }
+    if (!is.null(gbl$apply.p)) { gbl$p.values <- apply(gbl$p.values, c(1,2), gbl$apply.p) }
+    
+    gbl
   }
 
 .inside.bracket <-
@@ -352,7 +354,7 @@ is.wholenumber <-
   }
 
 .rename.intercept <-
-  function(x) {
+  function(x, gbl, fmt) {
     out <- x
     for (i in seq(1:length(x))) {
       if (x[i] %in% gbl$intercept.strings) { 
@@ -363,7 +365,7 @@ is.wholenumber <-
   }
 
 .order.reg.table <- 
-  function(order) {
+  function(fmt, gbl) {
     
     # first, find the position of the intercept and rename the variable to be the intercept string
     intercept.position <- NULL
@@ -371,13 +373,13 @@ is.wholenumber <-
       if (gbl$coefficient.variables[i] %in% gbl$intercept.strings) { 
         intercept.position <- i 
         
-        gbl$coefficient.variables[i] <<- fmt$intercept.name   
-        rownames(gbl$coefficients)[i] <<- fmt$intercept.name
-        rownames(gbl$std.errors)[i] <<- fmt$intercept.name
-        rownames(gbl$ci.lb)[i] <<- fmt$intercept.name
-        rownames(gbl$ci.rb)[i] <<- fmt$intercept.name
-        rownames(gbl$t.stats)[i] <<- fmt$intercept.name
-        rownames(gbl$p.values)[i] <<- fmt$intercept.name
+        gbl$coefficient.variables[i] <- fmt$intercept.name   
+        rownames(gbl$coefficients)[i] <- fmt$intercept.name
+        rownames(gbl$std.errors)[i] <- fmt$intercept.name
+        rownames(gbl$ci.lb)[i] <- fmt$intercept.name
+        rownames(gbl$ci.rb)[i] <- fmt$intercept.name
+        rownames(gbl$t.stats)[i] <- fmt$intercept.name
+        rownames(gbl$p.values)[i] <- fmt$intercept.name
       }
     }
     
@@ -388,11 +390,11 @@ is.wholenumber <-
       intercept.coefficient.variables <- gbl$coefficient.variables[intercept.position]
       
       if (fmt$intercept.bottom) {
-        gbl$coefficient.variables <<- c(placehold.coefficient.variables, intercept.coefficient.variables)
+        gbl$coefficient.variables <- c(placehold.coefficient.variables, intercept.coefficient.variables)
       }
       
       if (fmt$intercept.top) {
-        gbl$coefficient.variables <<- c(intercept.coefficient.variables, placehold.coefficient.variables)
+        gbl$coefficient.variables <- c(intercept.coefficient.variables, placehold.coefficient.variables)
       }
     } 
     
@@ -428,7 +430,8 @@ is.wholenumber <-
     else { new.order <- old.order }
     
     # set the right order
-    gbl$coefficient.variables[old.order] <<- gbl$coefficient.variables[new.order]
+    gbl$coefficient.variables[old.order] <- gbl$coefficient.variables[new.order]
+    gbl
   }
 
 .insert.col.front <- function(d, new.col) {
@@ -447,9 +450,9 @@ is.wholenumber <-
 }
 
 .order.data.frame <- 
-  function(d, order, summary=FALSE) {
+  function(d, order, summary=FALSE, fmt.rownames, fmt.perl) {
     
-    if ((fmt$rownames == TRUE) & (summary == FALSE)) {  # if we want to report rownames, add them to data frame
+    if ((fmt.rownames == TRUE) & (summary == FALSE)) {  # if we want to report rownames, add them to data frame
       if (!is.null(rownames(d))) { d <- .insert.col.front(d, rownames(d)) }
     }
     
@@ -463,7 +466,7 @@ is.wholenumber <-
         not.ordered.yet <- colnames(d)
         
         for (i in 1:length(order)) {
-          add.these <- grep(order[i], d, perl=fmt$perl, fixed=FALSE)
+          add.these <- grep(order[i], d, perl=fmt.perl, fixed=FALSE)
           not.ordered.yet[add.these] <- NA
           if (length(add.these) != 0) {
             new.order <- c(new.order, add.these)
@@ -488,7 +491,7 @@ is.wholenumber <-
 
 
 .print.additional.lines <-
-  function(part.number=NULL) {
+  function(part.number=NULL, fmt) {
     
     # if no additional lines, then quit the function
     if (is.null(fmt$add.lines)) { return(NULL) }
@@ -527,7 +530,9 @@ is.wholenumber <-
       cat(" \\\\ \n")
     }
     .table.part.published[part.number] <<- TRUE
+    
+    fmt
   }
 
 
-replace.dec.mark <- function(s) { return (gsub(".", fmt$decimal.character, s, fixed=TRUE))}
+replace.dec.mark <- function(s, fmt) { return (gsub(".", fmt$decimal.character, s, fixed=TRUE))}

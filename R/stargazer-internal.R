@@ -57,15 +57,35 @@ stargazer <-
     # should we include a summary statistics table when given a data frame
     gbl$summary <- rep(TRUE, times=how.many.objects)
     
-    fmt <- list()
-    
     ## check if argument input is ok
     fmt$rownames <- TRUE
     fmt$colnames <- TRUE
   
     # flip the table?
     fmt$flip <- flip
-  
+
+    coef <- .turn.into.list(coef); 
+    se <- .turn.into.list(se)
+    t <- .turn.into.list(t); 
+    p <- .turn.into.list(p)
+    ci.custom <- .turn.into.list(ci.custom)
+    add.lines <- .turn.into.list(add.lines)
+    
+    gbl["coef"] <- list(coef)
+    gbl["se"] <- list(se)
+    gbl["t"] <- list(t)
+    gbl["p"] <- list(p)
+    gbl["ci.custom"] <- list(ci.custom)
+    gbl["add.lines"] <- list(add.lines)
+    gbl["order"] <- list(order)
+    
+    gbl["apply.coef"] <- list(apply.coef)
+    gbl["apply.se"]   <- list(apply.se)
+    gbl["apply.t"]    <- list(apply.t)
+    gbl["apply.p"]    <- list(apply.p)
+    gbl["apply.ci"]   <- list(apply.ci)
+    
+              
     if (how.many.objects < 1) { error.present <- c(error.present, "% Error: At least one object is required.\n") }
     else {
       
@@ -174,9 +194,8 @@ stargazer <-
     if ((!is.character(dep.var.caption)) & (!is.null(dep.var.caption))) { error.present <- c(error.present, "% Error: Argument 'dep.var.caption must be NULL (default), or of type 'character.'\n") }
     if ((length(dep.var.caption) != 1) & (!is.null(dep.var.caption))) { error.present <- c(error.present, "% Error: Argument 'dep.var.caption' must be of length 1.'\n") }  
   
-    coef <- .turn.into.list(coef); se <- .turn.into.list(se)
-    t <- .turn.into.list(t); p <- .turn.into.list(p)
-    
+
+        
     if ((!.is.list.numeric(coef)))  { error.present <- c(error.present, "% Error: Argument 'coef' must be NULL (default), or a list of numeric vectors.\n") }
     if ((!.is.list.numeric(se)))  { error.present <- c(error.present, "% Error: Argument 'se' must be NULL (default), or a list of numeric vectors.\n") }
     if ((!.is.list.numeric(t)))  { error.present <- c(error.present, "% Error: Argument 't' must be NULL (default), or a list of numeric vectors.\n") }
@@ -193,7 +212,8 @@ stargazer <-
 
     if (!is.logical(ci)) { error.present <- c(error.present, "% Error: Argument 'ci' must be of type 'logical' (TRUE/FALSE) \n") }
     
-    ci.custom <- .turn.into.list(ci.custom)
+
+    
     if ((!.is.list.numeric.matrix(ci.custom)))  { error.present <- c(error.present, "% Error: Argument 'ci.custom' must be NULL (default), or a list of numeric matrices. \n") }
     else if (!is.null(ci.custom)) {
       l <- length(ci.custom)
@@ -212,7 +232,7 @@ stargazer <-
     if ((!is.character(ci.separator)) & (!is.null(ci.separator))) { error.present <- c(error.present, "% Error: Argument 'ci.separator' must be NULL (default), or of type 'character.'\n") }
     if ((length(ci.separator) != 1) & (!is.null(ci.separator))) { error.present <- c(error.present, "% Error: Argument 'ci.separator' must be of length 1.'\n") }
   
-    add.lines <- .turn.into.list(add.lines)
+
     if ((!is.list(add.lines)) & (!is.null(add.lines))) { error.present <- c(error.present, "% Error: Argument 'add.lines' must be NULL (default), or a list of vectors. \n") }
     if (!is.null(add.lines)) {
       if (length(add.lines) < 1) { error.present <- c(error.present, "% Error: The list in argument 'add.lines' must be of length 1 or more. \n") }
@@ -525,6 +545,10 @@ stargazer <-
     # intercept strings
     gbl$intercept.strings <- c("(Intercept)", "(intercept)","Intercept")
     
+    gbl$t.auto <- t.auto
+    gbl$p.auto <- p.auto
+    
+    
     # .formatting: Default
     fmt$space.size <- "-1.8ex"
     
@@ -556,66 +580,12 @@ stargazer <-
     
     # names for models
     fmt$model.names.include <- TRUE
-    fmt$model.names <- NULL
-    fmt$model.names <- cbind(c("aov","ANOVA",""), c("arima","ARIMA",""), c("Arima","ARIMA",""), c("blogit","bivariate","logistic"))
-    fmt$model.names <- cbind(fmt$model.names, c("bprobit","bivariate","probit"), c("betareg", "beta",""), c("chopit","compound hierarchical","ordered probit"))
-    fmt$model.names <- cbind(fmt$model.names, c("clm","cumulative","link"), c("censReg", "censored", "regression"), c("cloglog.net","network compl.","log log"), c("clogit","conditional","logistic"), c("coxph","Cox","prop. hazards"))
-    fmt$model.names <- cbind(fmt$model.names, c("dynlm","dynamic","linear"), c("lagsarlm","spatial","autoregressive"), c("errorsarlm","spatial","error"))
-    fmt$model.names <- cbind(fmt$model.names, c("ei.dynamic","Quinn dynamic","ecological inference"), c("ei.hier","$2 \times 2$ hierarchical","ecological inference"))
-    fmt$model.names <- cbind(fmt$model.names, c("ei.RxC","hierarchical multinominal-Dirichlet","ecological inference"), c("exp","exponential",""), c("ergm","exponential family","random graph"))
-    fmt$model.names <- cbind(fmt$model.names, c("factor.bayes","Bayesian","factor analysis"), c("factor.mix","mixed data","factor analysis"))
-    fmt$model.names <- cbind(fmt$model.names, c("factor.ord","ordinal data","factor analysis"), c("fGARCH","GARCH",""), c("gamma","gamma",""))
-    fmt$model.names <- cbind(fmt$model.names, c("gamma.gee","gamma generalized","estimating equation"), c("gamma.mixed","mixed effects","gamma"))
-    fmt$model.names <- cbind(fmt$model.names, c("gamma.net","network","gamma"), c("gamma.survey","survey-weighted","gamma"), c("glmrob","robust","GLM"), c("gls","generalized","least squares"))
-    fmt$model.names <- cbind(fmt$model.names, c("gmm","GMM",""), c("rem.dyad", "relational", "event (dyadic)"))
-    fmt$model.names <- cbind(fmt$model.names, c("irt1d","IRT","(1-dim.)"), c("irtkd","IRT","(k-dim.)"))
-    fmt$model.names <- cbind(fmt$model.names, c("logit","logistic",""), c("logit.bayes","Bayesian","logistic"))
-    fmt$model.names <- cbind(fmt$model.names, c("logit.gam","GAM","(logistic)"), c("logit.gee","logistic generalized","estimating equation"))
-    fmt$model.names <- cbind(fmt$model.names, c("logit.mixed","mixed effects","logistic"), c("logit.net","network","logistic"))
-    fmt$model.names <- cbind(fmt$model.names, c("logit.survey","survey-weighted","logistic"), c("lognorm","log-normal",""))
-    fmt$model.names <- cbind(fmt$model.names, c("lmer","linear","mixed-effects"), c("glmer","generalized linear","mixed-effects"), c("nlmer","non-linear","mixed-effects"))
-    fmt$model.names <- cbind(fmt$model.names, c("ls","OLS",""), c("ls.mixed","mixed effect","linear"), c("lme","linear","mixed effects"), c("lmrob","MM-type","linear"))
-    fmt$model.names <- cbind(fmt$model.names, c("ls.net","network","least squares"), c("mlogit","multinomial","logistic"), c("mnlogit","multinomial","logit"))
-    fmt$model.names <- cbind(fmt$model.names, c("mlogit.bayes","Bayesian","multinomial logistic"), c("negbin","negative","binomial"), c("normal","normal",""))
-    fmt$model.names <- cbind(fmt$model.names, c("multinom","multinomial log-linear","(neural networks)"), c("nlme","non-linear","mixed effects"))
-    fmt$model.names <- cbind(fmt$model.names, c("normal.bayes","Bayesian","normal"), c("normal.gam","GAM","(continuous)"))
-    fmt$model.names <- cbind(fmt$model.names, c("normal.gee","normal generalized","estimating equation"), c("normal.net","network","normal"))
-    fmt$model.names <- cbind(fmt$model.names, c("normal.survey","survey-weighted","normal"), c("ologit","ordered","logistic"))
-    fmt$model.names <- cbind(fmt$model.names, c("oprobit","ordered","probit"), c("oprobit.bayes","Bayesian","ordered probit"))
-    fmt$model.names <- cbind(fmt$model.names, c("pmg","mean","groups"), c("poisson","Poisson",""), c("poisson.bayes","Bayesian","Poisson"))
-    fmt$model.names <- cbind(fmt$model.names, c("poisson.gam","GAM","(count)"), c("poisson.mixed","mixed effects","Poisson"))
-    fmt$model.names <- cbind(fmt$model.names, c("poisson.survey","survey-weighted","Poisson"), c("poisson.gee","Poisson generalized","estimation equation"))
-    fmt$model.names <- cbind(fmt$model.names, c("probit","probit",""), c("probit.bayes","Bayesian","probit"))
-    fmt$model.names <- cbind(fmt$model.names, c("probit.gam","GAM","(probit)"), c("probit.gee","probit generalized","estimating equation"))
-    fmt$model.names <- cbind(fmt$model.names, c("probit.mixed","mixed effects","probit"), c("probit.net","network","probit"))
-    fmt$model.names <- cbind(fmt$model.names, c("probit.survey","survey-weighted","probit"), c("relogit","rare events","logistic"))
-    fmt$model.names <- cbind(fmt$model.names, c("rq","quantile","regression"))
-    fmt$model.names <- cbind(fmt$model.names, c("rlm","robust","linear"), c("sur","SUR",""), c("threesls","3SLS",""))
-    fmt$model.names <- cbind(fmt$model.names, c("tobit","Tobit",""), c("tobit(AER)","Tobit",""), c("tobit.bayes","Bayesian","Tobit"))
-    fmt$model.names <- cbind(fmt$model.names, c("twosls","2SLS",""), c("weibull","Weibull",""))
-    fmt$model.names <- cbind(fmt$model.names, c("zeroinfl","zero-inflated","count data"), c("hurdle","hurdle",""))
-    fmt$model.names <- cbind(fmt$model.names, c("plm","panel","linear"), c("pgmm","panel","GMM"), c("ivreg","instrumental","variable"))
-    fmt$model.names <- cbind(fmt$model.names, c("coxreg","Cox",""), c("mlreg","ML","prop. hazards"), c("weibreg","Weibull",""))
-    fmt$model.names <- cbind(fmt$model.names, c("aftreg","accelerated"," failure time"), c("phreg","parametric","prop. hazards"))
-    fmt$model.names <- cbind(fmt$model.names, c("bj","Buckley-James",""), c("cph","Cox",""), c("Gls","generalized","least squares"), c("lrm","logistic",""))
-    fmt$model.names <- cbind(fmt$model.names, c("ols","OLS",""), c("psm","parametric","survival"), c("Rq","quantile","regression"))
-    fmt$model.names <- cbind(fmt$model.names, c("hetglm","heteroskedastic","GLM"), c("coeftest","coefficient","test"))
-    fmt$model.names <- cbind(fmt$model.names, c("heckit","Heckman","selection"), c("selection","selection",""))
-    fmt$model.names <- cbind(fmt$model.names, c("probit.ss","probit",""), c("binaryChoice","binary","choice"))
-    fmt$model.names <- cbind(fmt$model.names, c("brglm","GLM","(bias reduction)"), c("maBina","binary model","(marginal effect)"))
-    fmt$model.names <- cbind(fmt$model.names, c("mclogit","mixed","conditional logit"))
-  
+
     # if you use, say, glm() that does not correspond to one of the pre-defined models, put this as family and link
     fmt$model.function <- TRUE
     fmt$model.family <- ""
     fmt$model.dist <- ""
     fmt$model.link <- "link = "
-    
-    ## names for journal/output styles
-    # economics
-    .journal.style.names <- cbind(c("aer","American Economic Review"), c("qje","Quarterly Journal of Economics"), c("econometrica","Econometrica"))
-    .journal.style.names <- cbind(.journal.style.names, c("jpe","Journal of Political Economy"), c("jel","Journal of Economic Literature"))
-    .journal.style.names <- cbind(.journal.style.names, c("jep","Journal of Economic Perspestives"))
     
     fmt$coefficient.variables.capitalize <- FALSE
     fmt$coefficient.variables.left <- ""
@@ -736,7 +706,7 @@ stargazer <-
     fmt$s.note.content <- NULL
 
     ####
-    .adjust.settings.style(style)
+    fmt <- .adjust.settings.style(style, fmt)
     
     # continue only if no errors
     if(length(error.present) != 1) { 
@@ -996,9 +966,9 @@ stargazer <-
     for (i in 1:length(fmt$cutoffs)) {
       if (!is.na(fmt$stars[i])) {
         star.string <- paste(rep("*", i), sep="", collapse="")
-        fmt$note.content <- gsub(paste("[.",star.string,"]",sep=""), replace.dec.mark(gsub("^[0]+", "",fmt$cutoffs[i])), fmt$note.content, fixed=TRUE)  
-        fmt$note.content <- gsub(paste("[0.",star.string,"]",sep=""), replace.dec.mark(fmt$cutoffs[i]), fmt$note.content, fixed=TRUE)
-        fmt$note.content <- gsub(paste("[",star.string,"]",sep=""), replace.dec.mark(fmt$cutoffs[i]*100), fmt$note.content, fixed=TRUE)        
+        fmt$note.content <- gsub(paste("[.",star.string,"]",sep=""), replace.dec.mark(gsub("^[0]+", "",fmt$cutoffs[i]), fmt), fmt$note.content, fixed=TRUE)  
+        fmt$note.content <- gsub(paste("[0.",star.string,"]",sep=""), replace.dec.mark(fmt$cutoffs[i], fmt), fmt$note.content, fixed=TRUE)
+        fmt$note.content <- gsub(paste("[",star.string,"]",sep=""), replace.dec.mark(fmt$cutoffs[i]*100, fmt), fmt$note.content, fixed=TRUE)        
       }
     }
     
@@ -1141,11 +1111,13 @@ stargazer <-
           else { fmt$label <- label[length(label)] }
           
           if (type == "latex") {
-            do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
-            invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+            do.call(.stargazer.reg.table, c(fmt=fmt, gbl=gbl, as.list(objects[regression.table.objects]))  )
+            invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(
+              do.call(.stargazer.reg.table, c(fmt=fmt, gbl=gbl, as.list(objects[regression.table.objects])))
+              ,file=NULL)) )
           }
           else if ((type == "text") | (type == "html") | (type == "mmd") ) {
-            latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+            latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, c(fmt=fmt, gbl=gbl, as.list(objects[regression.table.objects]))),file=NULL)) )
           }
         }
         
@@ -1158,11 +1130,12 @@ stargazer <-
         
         if (gbl$summary[i]==TRUE) {
           if (type == "latex") {
-            .stargazer.summ.stat.table(objects[[i]])
-            invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
+            .stargazer.summ.stat.table(objects[[i]], fmt, gbl)
+            invisible.output <- latex.code <- c(invisible.output, 
+                                                invisible(capture.output(.stargazer.summ.stat.table(objects[[i]], fmt, gbl),file=NULL)) )
           }
           else if ((type == "text") | (type == "html") | (type == "mmd")) {
-            latex.code <- c(latex.code, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
+            latex.code <- c(latex.code, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]], fmt, gbl),file=NULL)) )
           }
         }
         else {
@@ -1191,11 +1164,14 @@ stargazer <-
       else { fmt$label <- label[length(label)] }
       
       if (type == "latex") {
-        do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
-        invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+        do.call(".stargazer.reg.table", c(as.list(objects[regression.table.objects]), fmt=list(fmt), gbl=list(gbl)))  
+        invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(
+          do.call(.stargazer.reg.table, c(as.list(objects[regression.table.objects]), fmt=list(fmt), gbl=list(gbl)))
+                  ,file=NULL)) 
+          )
       }
       else if ((type == "text") | (type == "html") | (type == "mmd")) {
-        latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+        latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, c(fmt=fmt, gbl=gbl, as.list(objects[regression.table.objects]))),file=NULL)) )
       }
     }
     

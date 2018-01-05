@@ -1,6 +1,6 @@
 
 .new.table <-
-  function(object.name, user.coef=NULL, user.se=NULL, user.t=NULL, user.p=NULL, auto.t=TRUE, auto.p=TRUE, user.ci.lb=NULL, user.ci.rb=NULL) {
+  function(object.name, user.coef=NULL, user.se=NULL, user.t=NULL, user.p=NULL, auto.t=TRUE, auto.p=TRUE, user.ci.lb=NULL, user.ci.rb=NULL, gbl) {
     
     if (class(object.name)[1] == "Glm") {
       .summary.object <<- summary.glm(object.name)
@@ -25,62 +25,62 @@
     
     # set to null
     
-    gbl$models <<- NULL
+    gbl$models <- NULL
     
-    gbl$dependent.variables <<- NULL
-    gbl$dependent.variables.written <<- NULL
+    gbl$dependent.variables <- NULL
+    gbl$dependent.variables.written <- NULL
     
-    gbl$coefficient.variables <<- NULL
-    gbl$coef.vars.by.model <<- NULL
-    gbl$coefficients <<- NULL
-    gbl$std.errors <<- NULL
-    gbl$ci.lb <<- NULL
-    gbl$ci.rb <<- NULL
+    gbl$coefficient.variables <- NULL
+    gbl$coef.vars.by.model <- NULL
+    gbl$coefficients <- NULL
+    gbl$std.errors <- NULL
+    gbl$ci.lb <- NULL
+    gbl$ci.rb <- NULL
     
-    gbl$t.stats <<- NULL
-    gbl$p.values <<- NULL
+    gbl$t.stats <- NULL
+    gbl$p.values <- NULL
     
-    gbl$N <<- NULL
-    gbl$LL <<- NULL
-    gbl$R2 <<- NULL
-    gbl$max.R2 <<- NULL
-    gbl$adj.R2 <<- NULL
-    gbl$AIC <<- NULL
-    gbl$BIC <<- NULL
-    gbl$scale <<- NULL
-    gbl$UBRE <<- NULL
-    gbl$sigma2 <<- NULL
-    gbl$theta <<- NULL
-    gbl$rho <<- NULL
-    gbl$mills <<- NULL
+    gbl$N <- NULL
+    gbl$LL <- NULL
+    gbl$R2 <- NULL
+    gbl$max.R2 <- NULL
+    gbl$adj.R2 <- NULL
+    gbl$AIC <- NULL
+    gbl$BIC <- NULL
+    gbl$scale <- NULL
+    gbl$UBRE <- NULL
+    gbl$sigma2 <- NULL
+    gbl$theta <- NULL
+    gbl$rho <- NULL
+    gbl$mills <- NULL
     
-    gbl$SER <<- NULL
-    gbl$F.stat <<- NULL
-    gbl$chi.stat <<- NULL
-    gbl$wald.stat <<- NULL
-    gbl$lr.stat <<- NULL
-    gbl$logrank.stat <<- NULL
-    gbl$null.deviance <<- NULL
-    gbl$residual.deviance <<- NULL
+    gbl$SER <- NULL
+    gbl$F.stat <- NULL
+    gbl$chi.stat <- NULL
+    gbl$wald.stat <- NULL
+    gbl$lr.stat <- NULL
+    gbl$logrank.stat <- NULL
+    gbl$null.deviance <- NULL
+    gbl$residual.deviance <- NULL
     
     for (model.num in 1:model.num.total) {
       
-      gbl$models <<- c(gbl$models, suppressMessages(as.vector(.model.identify(object.name))))
+      gbl$models <- c(gbl$models, suppressMessages(as.vector(.model.identify(object.name))))
       
-      gbl$dependent.variables <<- c(gbl$dependent.variables, suppressMessages(.dependent.variable(object.name, model.num)))
-      gbl$dependent.variables.written <<- c(gbl$dependent.variables.written, suppressMessages(.dependent.variable.written(object.name, model.num)))
-      gbl$coefficient.variables <<- suppressMessages(.coefficient.variables(object.name))
+      gbl$dependent.variables <- c(gbl$dependent.variables, suppressMessages(.dependent.variable(object.name, model.num)))
+      gbl$dependent.variables.written <- c(gbl$dependent.variables.written, suppressMessages(.dependent.variable.written(object.name, model.num)))
+      gbl$coefficient.variables <- suppressMessages(.coefficient.variables(object.name))
       
-      gbl$coef.vars.by.model <<-  suppressMessages(cbind(gbl$coef.vars.by.model, gbl$coefficient.variables))
+      gbl$coef.vars.by.model <-  suppressMessages(cbind(gbl$coef.vars.by.model, gbl$coefficient.variables))
       
       get.coef <- suppressMessages(.get.coefficients(object.name, user.coef, model.num=model.num))
       get.se <- suppressMessages(.get.standard.errors(object.name, user.se, model.num=model.num))
       
-      gbl$coefficients <<- cbind(gbl$coefficients, get.coef)
-      gbl$std.errors <<- cbind(gbl$std.errors, get.se)
+      gbl$coefficients <- cbind(gbl$coefficients, get.coef)
+      gbl$std.errors <- cbind(gbl$std.errors, get.se)
       
-      gbl$ci.lb <<- suppressMessages(cbind(gbl$ci.lb, .get.ci.lb(object.name, user.ci.lb, model.num=model.num)))
-      gbl$ci.rb <<- suppressMessages(cbind(gbl$ci.rb, .get.ci.rb(object.name, user.ci.rb, model.num=model.num))) 
+      gbl$ci.lb <- suppressMessages(cbind(gbl$ci.lb, .get.ci.lb(object.name, user.ci.lb, model.num=model.num)))
+      gbl$ci.rb <- suppressMessages(cbind(gbl$ci.rb, .get.ci.rb(object.name, user.ci.rb, model.num=model.num))) 
       
       feed.coef <- NA; feed.se <- NA
       if (!is.null(get.coef)) { feed.coef <- get.coef }
@@ -88,40 +88,41 @@
       if (!is.null(user.coef)) { feed.coef <- user.coef }   # feed user-defined coefficients, if available
       if (!is.null(user.se)) { feed.se <- user.se }   # feed user-defined std errors, if available
       
-      gbl$t.stats <<- suppressMessages(cbind(gbl$t.stats, .get.t.stats(object.name, user.t, auto.t, feed.coef, feed.se, user.coef, user.se, model.num=model.num)))
-      gbl$p.values <<- suppressMessages(cbind(gbl$p.values, .get.p.values(object.name, user.p, auto.p, feed.coef, feed.se, user.coef, user.se, model.num=model.num)))
+      gbl$t.stats <- suppressMessages(cbind(gbl$t.stats, .get.t.stats(object.name, user.t, auto.t, feed.coef, feed.se, user.coef, user.se, model.num=model.num)))
+      gbl$p.values <- suppressMessages(cbind(gbl$p.values, .get.p.values(object.name, user.p, auto.p, feed.coef, feed.se, user.coef, user.se, model.num=model.num)))
       
       
-      gbl$N <<- c(gbl$N, suppressMessages(.number.observations(object.name)))
-      gbl$LL <<- c(gbl$LL, suppressMessages(.log.likelihood(object.name)))
-      gbl$R2 <<- c(gbl$R2, suppressMessages(.r.squared(object.name)))
-      gbl$max.R2 <<- c(gbl$max.R2, suppressMessages(.max.r.squared(object.name)))
-      gbl$adj.R2 <<- c(gbl$adj.R2, suppressMessages(.adj.r.squared(object.name)))
-      gbl$AIC <<- c(gbl$AIC, suppressMessages(.AIC(object.name)))
-      gbl$BIC <<- c(gbl$BIC, suppressMessages(.BIC(object.name)))
-      gbl$scale <<- c(gbl$scale, suppressMessages(.get.scale(object.name)))
-      gbl$UBRE <<- c(gbl$UBRE, suppressMessages(.gcv.UBRE(object.name)))
-      gbl$sigma2 <<- c(gbl$sigma2, suppressMessages(.get.sigma2(object.name)))
+      gbl$N <- c(gbl$N, suppressMessages(.number.observations(object.name)))
+      gbl$LL <- c(gbl$LL, suppressMessages(.log.likelihood(object.name)))
+      gbl$R2 <- c(gbl$R2, suppressMessages(.r.squared(object.name)))
+      gbl$max.R2 <- c(gbl$max.R2, suppressMessages(.max.r.squared(object.name)))
+      gbl$adj.R2 <- c(gbl$adj.R2, suppressMessages(.adj.r.squared(object.name)))
+      gbl$AIC <- c(gbl$AIC, suppressMessages(.AIC(object.name)))
+      gbl$BIC <- c(gbl$BIC, suppressMessages(.BIC(object.name)))
+      gbl$scale <- c(gbl$scale, suppressMessages(.get.scale(object.name)))
+      gbl$UBRE <- c(gbl$UBRE, suppressMessages(.gcv.UBRE(object.name)))
+      gbl$sigma2 <- c(gbl$sigma2, suppressMessages(.get.sigma2(object.name)))
       
-      gbl$rho <<- cbind(suppressMessages(.get.rho(object.name)))
-      gbl$mills <<- cbind(suppressMessages(.get.mills(object.name)))
-      gbl$theta <<- cbind(suppressMessages(.get.theta(object.name)))
-      gbl$SER <<- cbind(suppressMessages(.SER(object.name)))
-      gbl$F.stat <<- cbind(suppressMessages(.F.stat(object.name)))
-      gbl$chi.stat <<- cbind(suppressMessages(.chi.stat(object.name)))
-      gbl$wald.stat <<- cbind(suppressMessages(.wald.stat(object.name)))
-      gbl$lr.stat <<- cbind(suppressMessages(.lr.stat(object.name)))
-      gbl$logrank.stat <<- cbind(suppressMessages(.logrank.stat(object.name)))
-      gbl$null.deviance <<- cbind(suppressMessages(.null.deviance(object.name)))
-      gbl$residual.deviance <<- cbind(suppressMessages(.residual.deviance(object.name)))
+      gbl$rho <- cbind(suppressMessages(.get.rho(object.name)))
+      gbl$mills <- cbind(suppressMessages(.get.mills(object.name)))
+      gbl$theta <- cbind(suppressMessages(.get.theta(object.name)))
+      gbl$SER <- cbind(suppressMessages(.SER(object.name)))
+      gbl$F.stat <- cbind(suppressMessages(.F.stat(object.name)))
+      gbl$chi.stat <- cbind(suppressMessages(.chi.stat(object.name)))
+      gbl$wald.stat <- cbind(suppressMessages(.wald.stat(object.name)))
+      gbl$lr.stat <- cbind(suppressMessages(.lr.stat(object.name)))
+      gbl$logrank.stat <- cbind(suppressMessages(.logrank.stat(object.name)))
+      gbl$null.deviance <- cbind(suppressMessages(.null.deviance(object.name)))
+      gbl$residual.deviance <- cbind(suppressMessages(.residual.deviance(object.name)))
     }
     
+    gbl
   }
 
 
 
 .table.empty.line <-
-  function() {
+  function(fmt, gbl) {
     if (fmt$no.space == FALSE) {
       cat(" ")
       for (i in seq(1:length(gbl$models))) {
@@ -198,8 +199,8 @@
   }
 
 .table.header <-
-  function() {
-    .floating.header()
+  function(fmt, gbl) {
+    .floating.header(fmt)
     
     #
     .formatting.alignment <- paste("@{\\extracolsep{",fmt$column.sep.width,"}}l", sep="")
@@ -217,7 +218,7 @@
   }
 
 .table.info.comment <-
-  function() {
+  function(fmt, gbl) {
     cat("\n")
     if (fmt$header==TRUE) {
       cat("% Table created by ", gbl$package.name, " v.", gbl$package.version, " by ", gbl$package.author.name, ", ", gbl$package.author.affiliation, ". E-mail: ", gbl$package.author.email, "\n", sep="")  
@@ -239,290 +240,292 @@
   }
 
 .table.insert.space <-
-  function() {
+  function(fmt) {
     cat("\\\\[",fmt$space.size,"]",sep="")
   }
 
 
 .adjust.settings.style <-
-  function(what.style) {
+  function(what.style, fmt) {
     style <- tolower(what.style)
     
     if (style == "all") {
-      fmt$table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(p)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","BIC","UBRE","rho(se)*(p)","Mills(se)*(p)","residual deviance(df)*","null deviance(df)*","=!","notes")  
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*","standard error","t-stat","p-value")  
+      fmt$table.parts <- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(p)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","BIC","UBRE","rho(se)*(p)","Mills(se)*(p)","residual deviance(df)*","null deviance(df)*","=!","notes")  
+      fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error","t-stat","p-value")  
     }
     
     else if (style == "all2") {
-      fmt$table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(p)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","BIC","UBRE","rho(se)*(p)","Mills(se)*(p)","residual deviance(df)*","null deviance(df)*","=!","notes")  
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*","standard error")  
+      fmt$table.parts <- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(p)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","BIC","UBRE","rho(se)*(p)","Mills(se)*(p)","residual deviance(df)*","null deviance(df)*","=!","notes")  
+      fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error")  
     }
     
     # aer = American Economic Review
     else if (style == "aer") {
-      fmt$table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","-!","notes")
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
+      fmt$table.parts <- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","-!","notes")
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
       
-      fmt$until.nonzero.digit <<- FALSE
-      fmt$max.extra.digits <<- 0    
+      fmt$until.nonzero.digit <- FALSE
+      fmt$max.extra.digits <- 0    
       
-      fmt$model.left <<- ""
-      fmt$model.right <<- ""
+      fmt$model.left <- ""
+      fmt$model.right <- ""
       
-      fmt$note <<- "\\textit{Notes:}"
-      fmt$note.alignment <<- "l"
-      fmt$note.content <<- c("$^{***}$Significant at the [***] percent level.","$^{**}$Significant at the [**] percent level.","$^{*}$Significant at the [*] percent level.")
+      fmt$note <- "\\textit{Notes:}"
+      fmt$note.alignment <- "l"
+      fmt$note.content <- c("$^{***}$Significant at the [***] percent level.","$^{**}$Significant at the [**] percent level.","$^{*}$Significant at the [*] percent level.")
     }
     
     # ajps = American Journal of Political Science
     else if (style == "ajps") {
-      fmt$table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
-      fmt$digit.separator <<- ""
-      fmt$dependent.variables.left <<- "\\textbf{"
-      fmt$dependent.variables.right <<- "}"
-      fmt$column.left <<- "\\textbf{"
-      fmt$column.right <<- "}"
-      fmt$models.left <<- "\\textbf{"
-      fmt$models.right <<- "}"
-      fmt$numbers.left <<- "\\textbf{Model "
-      fmt$numbers.right <<- "}"
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*","standard error") 
-      fmt$N <<- "N"
-      fmt$AIC <<- "AIC"
-      fmt$BIC <<- "BIC"
-      fmt$chi.stat <<- "Chi-square"
-      fmt$R2 <<- "R-squared"
-      fmt$adj.R2 <<- "Adj. R-squared"
-      fmt$max.R2 <<- "Max. R-squared"
-      fmt$note <<- ""
-      fmt$note.content <<- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
-      fmt$note.alignment <<- "l"
-      fmt$s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
+      fmt$table.parts <- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
+      fmt$digit.separator <- ""
+      fmt$dependent.variables.left <- "\\textbf{"
+      fmt$dependent.variables.right <- "}"
+      fmt$column.left <- "\\textbf{"
+      fmt$column.right <- "}"
+      fmt$models.left <- "\\textbf{"
+      fmt$models.right <- "}"
+      fmt$numbers.left <- "\\textbf{Model "
+      fmt$numbers.right <- "}"
+      fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error") 
+      fmt$N <- "N"
+      fmt$AIC <- "AIC"
+      fmt$BIC <- "BIC"
+      fmt$chi.stat <- "Chi-square"
+      fmt$R2 <- "R-squared"
+      fmt$adj.R2 <- "Adj. R-squared"
+      fmt$max.R2 <- "Max. R-squared"
+      fmt$note <- ""
+      fmt$note.content <- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
+      fmt$note.alignment <- "l"
+      fmt$s.stat.parts <- c("-!","stat names","-","statistics1","-!","notes")
     }  
     
     # ajs = American Journal of Sociology
     else if (style == "ajs") {
-      fmt$table.parts <<- c(" ","=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","-!","notes")
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variables.capitalize <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
+      fmt$table.parts <- c(" ","=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","-!","notes")
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variables.capitalize <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
       
-      fmt$numbers.left <<- ""
-      fmt$numbers.right <<- ""
+      fmt$numbers.left <- ""
+      fmt$numbers.right <- ""
       
-      fmt$until.nonzero.digit <<- FALSE
-      fmt$max.extra.digits <<- 0    
+      fmt$until.nonzero.digit <- FALSE
+      fmt$max.extra.digits <- 0    
       
-      fmt$model.left <<- ""
-      fmt$model.right <<- ""
+      fmt$model.left <- ""
+      fmt$model.right <- ""
       
-      fmt$note <<- "\\textit{Notes:}"
-      fmt$note.alignment <<- "l"
-      fmt$note.content <<- c("$^{*}$P $<$ [.*]","$^{**}$P $<$ [.**]","$^{***}$P $<$ [.***]")
-      fmt$cutoffs <<- c(0.05, 0.01, 0.001)
+      fmt$note <- "\\textit{Notes:}"
+      fmt$note.alignment <- "l"
+      fmt$note.content <- c("$^{*}$P $<$ [.*]","$^{**}$P $<$ [.**]","$^{***}$P $<$ [.***]")
+      fmt$cutoffs <- c(0.05, 0.01, 0.001)
       
-      fmt$initial.zero <<- FALSE
+      fmt$initial.zero <- FALSE
     }
     
     # apsr = American Political Science Review
     else if (style == "apsr") {
-      fmt$table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
+      fmt$table.parts <- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
       
-      fmt$models.left <<- ""
-      fmt$models.right <<- ""
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*","standard error")
-      fmt$N <<- "N"
-      fmt$AIC <<- "AIC"
-      fmt$BIC <<- "BIC"
-      fmt$chi.stat <<- "chi$^{2}$"
-      fmt$note <<- ""
-      fmt$note.content <<- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
-      fmt$note.alignment <<- "l"
-      fmt$s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
+      fmt$models.left <- ""
+      fmt$models.right <- ""
+      fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error")
+      fmt$N <- "N"
+      fmt$AIC <- "AIC"
+      fmt$BIC <- "BIC"
+      fmt$chi.stat <- "chi$^{2}$"
+      fmt$note <- ""
+      fmt$note.content <- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
+      fmt$note.alignment <- "l"
+      fmt$s.stat.parts <- c("-!","stat names","-","statistics1","-!","notes")
     }
     
     # asq = Administrative Science Quarterly
     else if (style == "asq") {
-      fmt$table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
+      fmt$table.parts <- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
       
-      fmt$digit.separator <<- ""
-      fmt$dependent.variables.left <<- "\\textbf{"
-      fmt$dependent.variables.right <<- "}"
-      fmt$column.left <<- "\\textbf{"
-      fmt$column.right <<- "}"
-      fmt$models.left <<- "\\textbf{"
-      fmt$models.right <<- "}"
-      fmt$numbers.left <<- "\\textbf{Model "
-      fmt$numbers.right <<- "}"
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*","standard error") 
-      fmt$AIC <<- "AIC"
-      fmt$BIC <<- "BIC"
-      fmt$chi.stat <<- "Chi-square"
-      fmt$R2 <<- "R-squared"
-      fmt$adj.R2 <<- "Adj. R-squared"
-      fmt$max.R2 <<- "Max. R-squared"
-      fmt$note <<- ""
-      fmt$note.content <<- c("$^{\\bullet}$p $<$ [.*]; $^{\\bullet\\bullet}$p $<$ [.**]; $^{\\bullet\\bullet\\bullet}$p $<$ [.***]")
-      fmt$note.alignment <<- "l"
-      fmt$s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
-      fmt$stars <<- "\\bullet"
+      fmt$digit.separator <- ""
+      fmt$dependent.variables.left <- "\\textbf{"
+      fmt$dependent.variables.right <- "}"
+      fmt$column.left <- "\\textbf{"
+      fmt$column.right <- "}"
+      fmt$models.left <- "\\textbf{"
+      fmt$models.right <- "}"
+      fmt$numbers.left <- "\\textbf{Model "
+      fmt$numbers.right <- "}"
+      fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error") 
+      fmt$AIC <- "AIC"
+      fmt$BIC <- "BIC"
+      fmt$chi.stat <- "Chi-square"
+      fmt$R2 <- "R-squared"
+      fmt$adj.R2 <- "Adj. R-squared"
+      fmt$max.R2 <- "Max. R-squared"
+      fmt$note <- ""
+      fmt$note.content <- c("$^{\\bullet}$p $<$ [.*]; $^{\\bullet\\bullet}$p $<$ [.**]; $^{\\bullet\\bullet\\bullet}$p $<$ [.***]")
+      fmt$note.alignment <- "l"
+      fmt$s.stat.parts <- c("-!","stat names","-","statistics1","-!","notes")
+      fmt$stars <- "\\bullet"
     }  
     
     # asr = American Sociological Review
     else if (style == "asr") {
-      fmt$table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
+      fmt$table.parts <- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
       
-      fmt$models.left <<- ""
-      fmt$models.right <<- ""
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*")
-      fmt$N <<- "\\textit{N}"
-      fmt$AIC <<- "AIC"
-      fmt$BIC <<- "BIC"
-      fmt$chi.stat <<- "chi$^{2}$"
-      fmt$note <<- ""
-      fmt$note.content <<- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
-      fmt$cutoffs <<- c(0.05, 0.01, 0.001)
-      fmt$note.alignment <<- "l"
-      fmt$s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
+      fmt$models.left <- ""
+      fmt$models.right <- ""
+      fmt$coefficient.table.parts <- c("variable name","coefficient*")
+      fmt$N <- "\\textit{N}"
+      fmt$AIC <- "AIC"
+      fmt$BIC <- "BIC"
+      fmt$chi.stat <- "chi$^{2}$"
+      fmt$note <- ""
+      fmt$note.content <- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
+      fmt$cutoffs <- c(0.05, 0.01, 0.001)
+      fmt$note.alignment <- "l"
+      fmt$s.stat.parts <- c("-!","stat names","-","statistics1","-!","notes")
     }
     
     # "demography" = Demography
     else if (style == "demography") {
-      fmt$table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
+      fmt$table.parts <- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
       
-      fmt$models.left <<- ""
-      fmt$models.right <<- ""
-      fmt$numbers.left <<- "Model "
-      fmt$numbers.right <<- ""
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*","standard error")
-      fmt$N <<- "\\textit{N}"
-      fmt$AIC <<- "AIC"
-      fmt$BIC <<- "BIC"
-      fmt$chi.stat <<- "Chi-Square"
-      fmt$note <<- ""
-      fmt$note.content <<- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
-      fmt$cutoffs <<- c(0.05, 0.01, 0.001)
-      fmt$note.alignment <<- "l"
-      fmt$s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
+      fmt$models.left <- ""
+      fmt$models.right <- ""
+      fmt$numbers.left <- "Model "
+      fmt$numbers.right <- ""
+      fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error")
+      fmt$N <- "\\textit{N}"
+      fmt$AIC <- "AIC"
+      fmt$BIC <- "BIC"
+      fmt$chi.stat <- "Chi-Square"
+      fmt$note <- ""
+      fmt$note.content <- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
+      fmt$cutoffs <- c(0.05, 0.01, 0.001)
+      fmt$note.alignment <- "l"
+      fmt$s.stat.parts <- c("-!","stat names","-","statistics1","-!","notes")
     }
     
     # io = International Organization
     else if (style == "io") {
-      fmt$table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
+      fmt$table.parts <- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
       
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*","standard error")
-      fmt$coefficient.variables.capitalize <<- TRUE
-      fmt$s.coefficient.variables.capitalize <<- TRUE
-      fmt$intercept.name <<- "Constant"
-      fmt$N <<- "\\textit{Observations}"
-      fmt$AIC <<- "\\textit{Akaike information criterion}"
-      fmt$BIC <<- "\\textit{Bayesian information criterion}"
-      fmt$chi.stat <<- "\\textit{Chi-square}"
-      fmt$logrank.stat <<- "\\textit{Score (logrank) test}"
-      fmt$lr.stat <<- "\\textit{LR test}"
-      fmt$max.R2 <<- "\\textit{Maximum R-squared}"
-      fmt$R2 <<- "\\textit{R-squared}"
-      fmt$adj.R2 <<- "\\textit{Adjusted R-squared}"
-      fmt$UBRE <<- "\\textit{UBRE}"
-      fmt$F.stat <<- "\\textit{F statistic}"
-      fmt$LL <<- "\\textit{Log likelihood}"
-      fmt$SER <<- "\\textit{Residual standard error}"
-      fmt$null.deviance <<- "\\textit{Null deviance}"
-      fmt$residual.deviance <<- "\\textit{Residual deviance}"
-      fmt$scale <<- "\\textit{Scale}"
-      fmt$wald.stat <<- "\\textit{Wald test}"
-      fmt$note <<- "\\textit{Notes:}"
-      fmt$note.content <<- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
-      fmt$note.alignment <<- "l"
-      fmt$s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
+      fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error")
+      fmt$coefficient.variables.capitalize <- TRUE
+      fmt$s.coefficient.variables.capitalize <- TRUE
+      fmt$intercept.name <- "Constant"
+      fmt$N <- "\\textit{Observations}"
+      fmt$AIC <- "\\textit{Akaike information criterion}"
+      fmt$BIC <- "\\textit{Bayesian information criterion}"
+      fmt$chi.stat <- "\\textit{Chi-square}"
+      fmt$logrank.stat <- "\\textit{Score (logrank) test}"
+      fmt$lr.stat <- "\\textit{LR test}"
+      fmt$max.R2 <- "\\textit{Maximum R-squared}"
+      fmt$R2 <- "\\textit{R-squared}"
+      fmt$adj.R2 <- "\\textit{Adjusted R-squared}"
+      fmt$UBRE <- "\\textit{UBRE}"
+      fmt$F.stat <- "\\textit{F statistic}"
+      fmt$LL <- "\\textit{Log likelihood}"
+      fmt$SER <- "\\textit{Residual standard error}"
+      fmt$null.deviance <- "\\textit{Null deviance}"
+      fmt$residual.deviance <- "\\textit{Residual deviance}"
+      fmt$scale <- "\\textit{Scale}"
+      fmt$wald.stat <- "\\textit{Wald test}"
+      fmt$note <- "\\textit{Notes:}"
+      fmt$note.content <- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
+      fmt$note.alignment <- "l"
+      fmt$s.stat.parts <- c("-!","stat names","-","statistics1","-!","notes")
     }
     
     
     # jpam = Journal of Policy Analysis and Management
     else if (style == "jpam") {
-      fmt$table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
-      fmt$models.skip.if.one <<- TRUE
-      fmt$dependent.variable.text.on <<- FALSE
+      fmt$table.parts <- c("-!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","rho(se)*","Mills(se)*","-!","notes")    
+      fmt$models.skip.if.one <- TRUE
+      fmt$dependent.variable.text.on <- FALSE
       
-      fmt$models.left <<- ""
-      fmt$models.right <<- ""
-      fmt$numbers.left <<- "Model "
-      fmt$numbers.right <<- ""
-      fmt$numbers.roman <<- TRUE
-      fmt$coefficient.table.parts <<- c("variable name","coefficient*","standard error")
-      fmt$intercept.bottom <<- FALSE
-      fmt$intercept.top <<- TRUE
-      fmt$N <<- "N"
-      fmt$AIC <<- "AIC"
-      fmt$BIC <<- "BIC"
-      fmt$note <<- "\\textit{Note:}"
-      fmt$note.content <<- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
-      fmt$note.alignment <<- "l"
-      fmt$s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
-      fmt$s.statistics.names <<- cbind(c("n","N"), c("nmiss","missing"), c("mean","Mean"), c("sd","SD"), c("median","Median"), c("min","Minimum"), c("max","Maximum"), c("mad","Median Abs. Dev."), c("p","Percentile(!)"))
+      fmt$models.left <- ""
+      fmt$models.right <- ""
+      fmt$numbers.left <- "Model "
+      fmt$numbers.right <- ""
+      fmt$numbers.roman <- TRUE
+      fmt$coefficient.table.parts <- c("variable name","coefficient*","standard error")
+      fmt$intercept.bottom <- FALSE
+      fmt$intercept.top <- TRUE
+      fmt$N <- "N"
+      fmt$AIC <- "AIC"
+      fmt$BIC <- "BIC"
+      fmt$note <- "\\textit{Note:}"
+      fmt$note.content <- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
+      fmt$note.alignment <- "l"
+      fmt$s.stat.parts <- c("-!","stat names","-","statistics1","-!","notes")
+      fmt$s.statistics.names <- cbind(c("n","N"), c("nmiss","missing"), c("mean","Mean"), c("sd","SD"), c("median","Median"), c("min","Minimum"), c("max","Maximum"), c("mad","Median Abs. Dev."), c("p","Percentile(!)"))
       
     }
     
     # "qje" = Quarterly Journal of Economics
     else if (style=="qje") {
-      fmt$table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")    
-      fmt$dependent.variable.text.on <<- FALSE
-      fmt$s.stat.parts <<- c("-!","stat names","=","statistics1","=!","notes")
-      fmt$N <<- "\\textit{N}"
-      fmt$note <<- "\\textit{Notes:}"
-      fmt$note.content <<- c("$^{***}$Significant at the [***] percent level.", "$^{**}$Significant at the [**] percent level.", "$^{*}$Significant at the [*] percent level.") 
+      fmt$table.parts <- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")    
+      fmt$dependent.variable.text.on <- FALSE
+      fmt$s.stat.parts <- c("-!","stat names","=","statistics1","=!","notes")
+      fmt$N <- "\\textit{N}"
+      fmt$note <- "\\textit{Notes:}"
+      fmt$note.content <- c("$^{***}$Significant at the [***] percent level.", "$^{**}$Significant at the [**] percent level.", "$^{*}$Significant at the [*] percent level.") 
     }
     
     # find style based on journal ("default" or other)
     else if (style=="commadefault") {
-      fmt$table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")
-      fmt$digit.separator <<- " "
-      fmt$decimal.character <<- ","
+      fmt$table.parts <- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")
+      fmt$digit.separator <- " "
+      fmt$decimal.character <- ","
     }
     
     else if (style=="default") {
-      fmt$table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")
+      fmt$table.parts <- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")
     }
+    
+    fmt
   }
 
 .set.font.size <- 
-  function() {
+  function(fmt) {
     if (!is.null(fmt$font.size)) {
       cat("\\", fmt$font.size," \n", sep="")
     }
   }
 
 .floating.header <-
-  function() {
+  function(fmt) {
     if (fmt$floating==TRUE) {
       cat("\\begin{", fmt$floating.environment,"}[", fmt$table.placement,"] \\centering \n",sep="")
       cat("  \\caption{", fmt$title, "} \n",sep="")   
       cat("  \\label{", fmt$label, "} \n",sep="")
-      .set.font.size()
+      .set.font.size(fmt)
     }
     else if (!is.null(fmt$font.size)) { # set font size using begingroup
       cat("\\begingroup \n", sep="")
-      .set.font.size()
+      .set.font.size(fmt)
     }
   }
 
 
 
 .print.table.statistic <-
-  function(gbl$var.name, fmt$var.name, decimal.digits=fmt$round.digits, part.string="", part.number=NULL, type.se=FALSE) {
+  function(gbl.var.name, fmt.var.name, decimal.digits=fmt$round.digits, part.string="", part.number=NULL, type.se=FALSE, fmt, gbl) {
     
     # default values
     report.df <- FALSE
@@ -542,16 +545,16 @@
     
     
     # first for vectors (statistics without, say, degrees of freedom)
-    if (is.vector(gbl$var.name) == TRUE) {
-      if (sum(!is.na(gbl$var.name))!=0) {
-        cat (fmt$var.name)
+    if (is.vector(gbl.var.name) == TRUE) {
+      if (sum(!is.na(gbl.var.name))!=0) {
+        cat (fmt.var.name)
         for (i in seq(1:length(gbl$models))) {
-          if (!is.na(gbl$var.name[i])) { 
+          if (!is.na(gbl.var.name[i])) { 
             if (fmt$dec.mark.align == TRUE) {
-              cat(" & \\multicolumn{1}{c}{",.iround(gbl$var.name[i], decimal.digits),"}", sep="")
+              cat(" & \\multicolumn{1}{c}{",.iround(gbl.var.name[i], decimal.digits, fmt=fmt),"}", sep="")
             }
             else {
-              cat(" & ",.iround(gbl$var.name[i], decimal.digits), sep="")
+              cat(" & ",.iround(gbl.var.name[i], decimal.digits, fmt=fmt), sep="")
             }
           }
           else { cat(" & ", sep="") }
@@ -560,8 +563,8 @@
         .table.part.published[part.number] <<- TRUE
       }
     }
-    else if ((is.matrix(gbl$var.name) == TRUE) & (type.se == FALSE)) {     # for statistics that have degrees of freedom
-      if (sum(!is.na(as.vector(gbl$var.name["statistic",])))!=0) {
+    else if ((is.matrix(gbl.var.name) == TRUE) & (type.se == FALSE)) {     # for statistics that have degrees of freedom
+      if (sum(!is.na(as.vector(gbl.var.name["statistic",])))!=0) {
         
         # intelligent df reporting (figure out whether only report it on left side, or also)
         report.df.left.column <- FALSE
@@ -570,8 +573,8 @@
         df.all.together <- NULL
         for (i in seq(1:length(gbl$models))) {
           df.string <- ""
-          for (j in seq(1:(nrow(gbl$var.name)- 2))) {
-            df.string <- paste(df.string,";",as.character(gbl$var.name[paste("df",as.character(j),sep=""),i]),sep="")
+          for (j in seq(1:(nrow(gbl.var.name)- 2))) {
+            df.string <- paste(df.string,";",as.character(gbl.var.name[paste("df",as.character(j),sep=""),i]),sep="")
           }
           df.all.together <- append(df.all.together, df.string)
         }
@@ -588,7 +591,7 @@
         }
         
         # write down the line	
-        cat (fmt$var.name)
+        cat (fmt.var.name)
         
         # report df on left side w/ intelligent reporting
         if (report.df.left.column == TRUE) {
@@ -607,28 +610,28 @@
         
         # now, go column by column
         for (i in seq(1:length(gbl$models))) {
-          if (!is.na(gbl$var.name["statistic",i])) {
+          if (!is.na(gbl.var.name["statistic",i])) {
             
             if (fmt$dec.mark.align==TRUE) {
-              cat(" & \\multicolumn{1}{c}{",.iround(gbl$var.name["statistic",i], decimal.digits), sep="") 
+              cat(" & \\multicolumn{1}{c}{",.iround(gbl.var.name["statistic",i], decimal.digits, fmt=fmt), sep="") 
               force.math <- TRUE
             }
             else {
-              cat(" & ",.iround(gbl$var.name["statistic",i], decimal.digits), sep="")
+              cat(" & ",.iround(gbl.var.name["statistic",i], decimal.digits, fmt=fmt), sep="")
             }
             
             # significance stars
-            if ((significance.stars == TRUE) & (!is.na(gbl$var.name["p-value",i]))) { .enter.significance.stars(gbl$var.name["p-value",i], force.math) }
+            if ((significance.stars == TRUE) & (!is.na(gbl.var.name["p-value",i]))) { .enter.significance.stars(gbl.var.name["p-value",i], force.math, fmt=fmt) }
             
             
             # degrees of freedom - only report by statistics if not in the left column already
             if (report.df.left.column == FALSE) {
-              if ((report.df == TRUE) & (!is.na(gbl$var.name["df1",i]))) {
+              if ((report.df == TRUE) & (!is.na(gbl.var.name["df1",i]))) {
                 cat(" ",fmt$df.left,sep="")
-                for (j in seq(1:(nrow(gbl$var.name)- 2))) {
-                  if (!is.na(gbl$var.name[paste("df",as.character(j),sep=""),i])) {
+                for (j in seq(1:(nrow(gbl.var.name)- 2))) {
+                  if (!is.na(gbl.var.name[paste("df",as.character(j),sep=""),i])) {
                     if (j>=2) { cat(fmt$df.separator) }
-                    cat(gbl$var.name[paste("df",as.character(j),sep=""),i],sep="")
+                    cat(gbl.var.name[paste("df",as.character(j),sep=""),i],sep="")
                   }
                 }
                 cat(fmt$df.right,sep="")
@@ -636,10 +639,10 @@
             }
             
             # p-values
-            if ((report.p.value == TRUE) & (!is.na(gbl$var.name["p-value",i]))) {
+            if ((report.p.value == TRUE) & (!is.na(gbl.var.name["p-value",i]))) {
               cat(" ",fmt$p.value.left,sep="")
-              if (!is.na(gbl$var.name[paste("df",as.character(j),sep=""),i])) { 
-                cat(.iround(gbl$var.name["p-value",i],fmt$round.digits, round.up.positive=TRUE),sep="") 
+              if (!is.na(gbl.var.name[paste("df",as.character(j),sep=""),i])) { 
+                cat(.iround(gbl.var.name["p-value",i],fmt$round.digits, round.up.positive=TRUE),sep="") 
               }
               cat(fmt$p.value.right,sep="")
             }
@@ -658,35 +661,35 @@
         .table.part.published[part.number] <<- TRUE
       }
     }
-    else if ((is.matrix(gbl$var.name) == TRUE) & (type.se == TRUE)) {       # for statistics that have a standard error
-      if (sum(!is.na(as.vector(gbl$var.name["statistic",])))!=0) {
+    else if ((is.matrix(gbl.var.name) == TRUE) & (type.se == TRUE)) {       # for statistics that have a standard error
+      if (sum(!is.na(as.vector(gbl.var.name["statistic",])))!=0) {
         
         # write down the line	
-        cat (fmt$var.name)
+        cat (fmt.var.name)
         
         # now, go column by column
         for (i in seq(1:length(gbl$models))) {
-          if (!is.na(gbl$var.name["statistic",i])) { 
+          if (!is.na(gbl.var.name["statistic",i])) { 
             
             if (fmt$dec.mark.align == TRUE) {
-              cat(" & \\multicolumn{1}{c}{",.iround(gbl$var.name["statistic",i], decimal.digits), sep="")  
+              cat(" & \\multicolumn{1}{c}{",.iround(gbl.var.name["statistic",i], decimal.digits), sep="")  
             }
             else {
-              cat(" & ",.iround(gbl$var.name["statistic",i], decimal.digits), sep="")
+              cat(" & ",.iround(gbl.var.name["statistic",i], decimal.digits), sep="")
             }
             
             
             # significance stars
-            if ((significance.stars == TRUE) & (!is.na(gbl$var.name["p-value",i]))) { .enter.significance.stars(gbl$var.name["p-value",i], force.math) }
+            if ((significance.stars == TRUE) & (!is.na(gbl.var.name["p-value",i]))) { .enter.significance.stars(gbl.var.name["p-value",i], force.math) }
             
             # standard errors
-            if ((report.se == TRUE) & (!is.na(gbl$var.name["se",i]))) { cat(" ",fmt$se.left,.iround(gbl$var.name["se",i], decimal.digits),fmt$se.right,sep="") }
+            if ((report.se == TRUE) & (!is.na(gbl.var.name["se",i]))) { cat(" ",fmt$se.left,.iround(gbl.var.name["se",i], decimal.digits),fmt$se.right,sep="") }
             
             # t-statistics
-            if ((report.tstat == TRUE) & (!is.na(gbl$var.name["tstat",i]))) { cat(" ",fmt$tstat.left, .iround(gbl$var.name["tstat",i], decimal.digits),fmt$tstat.right,sep="") }
+            if ((report.tstat == TRUE) & (!is.na(gbl.var.name["tstat",i]))) { cat(" ",fmt$tstat.left, .iround(gbl.var.name["tstat",i], decimal.digits),fmt$tstat.right,sep="") }
             
             # p-values
-            if ((report.p.value == TRUE) & (!is.na(gbl$var.name["p-value",i]))) { cat(" ",fmt$p.value.left,.iround(gbl$var.name["p-value",i], decimal.digits),fmt$p.value.right,sep="") }
+            if ((report.p.value == TRUE) & (!is.na(gbl.var.name["p-value",i]))) { cat(" ",fmt$p.value.left,.iround(gbl.var.name["p-value",i], decimal.digits),fmt$p.value.right,sep="") }
             
             if (fmt$dec.mark.align == TRUE) {
               cat("}")
@@ -704,21 +707,21 @@
   }
 
 .publish.table <-
-  function() {
+  function(fmt, gbl) {
     
-    .table.info.comment()
+    .table.info.comment(fmt, gbl)
     
     # table header
     
-    .table.header()
-    .table.insert.space()
+    .table.header(fmt, gbl)
+    .table.insert.space(fmt)
     
     .table.part.published <<- as.vector(rep(NA, times=length(fmt$table.parts)))    # to keep track what has been published (to deal intelligently with horizontal lines)
     .publish.horizontal.line <<- TRUE   # should non-compulsory horizontal lines be published? (yes, if something else published since the previous line)
     
     if (length(fmt$table.parts)>=1) {
       for (i in seq(1:length(fmt$table.parts))) {
-        .publish.table.part(part=fmt$table.parts[i], which.part.number=i)
+        .publish.table.part(part=fmt$table.parts[i], which.part.number=i, fmt, gbl)
         
         if (.table.part.published[i]==TRUE) { .publish.horizontal.line <<- TRUE }
         if ((fmt$table.parts[i]=="-") | (fmt$table.parts[i]=="-!") | (fmt$table.parts[i]=="=") | (fmt$table.parts[i]=="=!")) { .publish.horizontal.line <<- FALSE }
@@ -734,7 +737,7 @@
   }
 
 .publish.table.part <-
-  function(part, which.part.number) {
+  function(part, which.part.number, fmt, gbl) {
     
     .table.part.published[which.part.number] <<- FALSE
     
@@ -749,13 +752,13 @@
     
     # dependent variables
     else if (part=="dependent variables") {
-      .table.insert.space()
+      .table.insert.space(fmt)
       cat(fmt$dependent.variables.text)
       how.many.columns <- 0
       label.counter <- 0
       
       for (i in seq(1:length(gbl$models))) {
-        if (is.null(fmt$dep.var.labels)) { fmt$dep.var.labels <<- NA }
+        if (is.null(fmt$dep.var.labels)) { fmt$dep.var.labels <- NA }
         how.many.columns <- how.many.columns + 1
         
         # write down if next column has different dependent variable, or if end of columns
@@ -803,17 +806,19 @@
     else if (part=="models")  {
       if ((fmt$model.names.include==TRUE) & ((fmt$models.skip.if.one == FALSE) | ((fmt$models.skip.if.one == TRUE) & (length(unique(gbl$models))>=2)))) {
         
-        .table.insert.space()
+        renamedgbl <- list()
+        
+        .table.insert.space(fmt)
         cat(fmt$models.text)
         
         # rename models based on .formatting preferences
         renamedgbl$models <- as.matrix(rbind(gbl$models, rep("", times=length(gbl$models))))
         for (i in seq(1:length(gbl$models))) {
-          for (j in seq(1:ncol(fmt$model.names))) {
+          for (j in seq(1:ncol(fmt.model.names))) {
             model.strsplit <- unlist(strsplit(gbl$models[i], split="#"))
-            if (gbl$models[i]==fmt$model.names[1,j]) { 
-              renamedgbl$models[1,i] <- fmt$model.names[2,j] 
-              renamedgbl$models[2,i] <- fmt$model.names[3,j]
+            if (gbl$models[i]==fmt.model.names[1,j]) { 
+              renamedgbl$models[1,i] <- fmt.model.names[2,j] 
+              renamedgbl$models[2,i] <- fmt.model.names[3,j]
             }
             else if ((model.strsplit[1]=="glm()") | (model.strsplit[1]=="svyglm()") | (model.strsplit[1]=="gee()") | (model.strsplit[1]=="gam()")) {
               if ( fmt$model.function == TRUE ) { renamedgbl$models[1,i] <- paste(substr(model.strsplit[1],1,nchar(model.strsplit[1])-2),": ", fmt$model.family, model.strsplit[2], sep="") }
@@ -957,7 +962,7 @@
     # numbers
     else if (part=="numbers") {
       if ((fmt$model.numbers == TRUE) & (length(gbl$models)>1)) {
-        .table.insert.space()
+        .table.insert.space(fmt)
         cat(fmt$numbers.text)
         for (i in seq(1:length(gbl$models))) {
           if (fmt$dec.mark.align==TRUE) {
@@ -995,7 +1000,7 @@
     ## coefficients
     else if (part=="coefficients") { 		
       .which.variable.label <<- 0
-      if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <<- NA }
+      if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <- NA }
       
       # then, enter the coefficients
       
@@ -1005,18 +1010,18 @@
     }
     
     # number of observations
-    else if (part=="N") { .print.table.statistic(gbl$var.name=gbl$N, fmt$var.name=fmt$N, decimal.digits=0, part.number=which.part.number) }
+    else if (part=="N") { .print.table.statistic(gbl.var.name=gbl$N, fmt.var.name=fmt$N, decimal.digits=0, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # fixed effects table
     else if (part=="omit") {
       if ((!is.null(fmt$omit.regexp)) & (!is.null(fmt$omit.labels))) {
-        fmt$omit.table <<- matrix(fmt$omit.no, nrow=length(fmt$omit.regexp), ncol=length(gbl$models)) 
+        fmt$omit.table <- matrix(fmt$omit.no, nrow=length(fmt$omit.regexp), ncol=length(gbl$models)) 
         for (i in seq(1:length(gbl$models))) {
           for (j in seq(1:length(fmt$omit.regexp))) {
             for (k in seq(1:length(gbl$coef.vars.by.model[,i]))) {
               relevant.coef.var <- gbl$coef.vars.by.model[k,i]
               if (length(grep(fmt$omit.regexp[j], relevant.coef.var, perl=fmt$perl, fixed=FALSE))!=0) {
-                fmt$omit.table[j,i] <<- fmt$omit.yes
+                fmt$omit.table[j,i] <- fmt$omit.yes
               }
             }
           }
@@ -1038,74 +1043,74 @@
     }
     
     # R-squared
-    else if (part=="R-squared") {	.print.table.statistic(gbl$var.name=gbl$R2, fmt$var.name=fmt$R2, part.number=which.part.number) }
+    else if (part=="R-squared") {	.print.table.statistic(gbl.var.name=gbl$R2, fmt.var.name=fmt$R2, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # max R-squared
-    else if (part=="max R-squared") {	.print.table.statistic(gbl$var.name=gbl$max.R2, fmt$var.name=fmt$max.R2, part.number=which.part.number) }
+    else if (part=="max R-squared") {	.print.table.statistic(gbl.var.name=gbl$max.R2, fmt.var.name=fmt$max.R2, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # adjusted R-squared
-    else if (part=="adjusted R-squared") { .print.table.statistic(gbl$var.name=gbl$adj.R2, fmt$var.name=fmt$adj.R2, part.number=which.part.number) }
+    else if (part=="adjusted R-squared") { .print.table.statistic(gbl.var.name=gbl$adj.R2, fmt.var.name=fmt$adj.R2, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # log likelihood
-    else if (part=="log likelihood") { .print.table.statistic(gbl$var.name=gbl$LL, fmt$var.name=fmt$LL, part.number=which.part.number) }
+    else if (part=="log likelihood") { .print.table.statistic(gbl.var.name=gbl$LL, fmt.var.name=fmt$LL, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # Akaike Information Criterion (AIC)
-    else if (part=="AIC") { .print.table.statistic(gbl$var.name=gbl$AIC, fmt$var.name=fmt$AIC, part.number=which.part.number) }
+    else if (part=="AIC") { .print.table.statistic(gbl.var.name=gbl$AIC, fmt.var.name=fmt$AIC, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # Bayesian Information Criterion (BIC)
-    else if (part=="BIC") { .print.table.statistic(gbl$var.name=gbl$BIC, fmt$var.name=fmt$BIC, part.number=which.part.number) }
+    else if (part=="BIC") { .print.table.statistic(gbl.var.name=gbl$BIC, fmt.var.name=fmt$BIC, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # Scale Parameter
-    else if (part=="scale") { .print.table.statistic(gbl$var.name=gbl$scale, fmt$var.name=fmt$scale, part.number=which.part.number) }
+    else if (part=="scale") { .print.table.statistic(gbl.var.name=gbl$scale, fmt.var.name=fmt$scale, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # UBRE
-    else if (part=="UBRE") { .print.table.statistic(gbl$var.name=gbl$UBRE, fmt$var.name=fmt$UBRE, part.number=which.part.number) }
+    else if (part=="UBRE") { .print.table.statistic(gbl.var.name=gbl$UBRE, fmt.var.name=fmt$UBRE, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # sigma2
-    else if (part=="sigma2") { .print.table.statistic(gbl$var.name=gbl$sigma2, fmt$var.name=fmt$sigma2, part.number=which.part.number) }
+    else if (part=="sigma2") { .print.table.statistic(gbl.var.name=gbl$sigma2, fmt.var.name=fmt$sigma2, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     ## with degrees of freedom
     
     # residual standard error (sigma); standard error of the regression
-    else if (substr(part,1,nchar("SER"))=="SER") { .print.table.statistic(gbl$var.name=gbl$SER, fmt$var.name=fmt$SER, part.string=part, part.number=which.part.number) }
+    else if (substr(part,1,nchar("SER"))=="SER") { .print.table.statistic(gbl.var.name=gbl$SER, fmt.var.name=fmt$SER, part.string=part, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # F-statistic
-    else if (substr(part,1,nchar("F statistic"))=="F statistic") { .print.table.statistic(gbl$var.name=gbl$F.stat, fmt$var.name=fmt$F.stat, part.string=part, part.number=which.part.number) }
+    else if (substr(part,1,nchar("F statistic"))=="F statistic") { .print.table.statistic(gbl.var.name=gbl$F.stat, fmt.var.name=fmt$F.stat, part.string=part, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # theta
-    else if (substr(part,1,nchar("theta"))=="theta") { .print.table.statistic(gbl$var.name=gbl$theta, fmt$var.name=fmt$theta, part.string=part, part.number=which.part.number, type.se=TRUE) }
+    else if (substr(part,1,nchar("theta"))=="theta") { .print.table.statistic(gbl.var.name=gbl$theta, fmt.var.name=fmt$theta, part.string=part, part.number=which.part.number, type.se=TRUE, fmt=fmt, gbl=gbl) }
     
     # rho
-    else if (substr(part,1,nchar("rho"))=="rho") { .print.table.statistic(gbl$var.name=gbl$rho, fmt$var.name=fmt$rho, part.string=part, part.number=which.part.number, type.se=TRUE) }
+    else if (substr(part,1,nchar("rho"))=="rho") { .print.table.statistic(gbl.var.name=gbl$rho, fmt.var.name=fmt$rho, part.string=part, part.number=which.part.number, type.se=TRUE, fmt=fmt, gbl=gbl) }
     
     # Inverse Mills ratio
-    else if (substr(part,1,nchar("Mills"))=="Mills") { .print.table.statistic(gbl$var.name=gbl$mills, fmt$var.name=fmt$mills, part.string=part, part.number=which.part.number, type.se=TRUE) }
+    else if (substr(part,1,nchar("Mills"))=="Mills") { .print.table.statistic(gbl.var.name=gbl$mills, fmt.var.name=fmt$mills, part.string=part, part.number=which.part.number, type.se=TRUE, fmt=fmt, gbl=gbl) }
     
     
     # Chi-squared
-    else if (substr(part,1,nchar("chi2"))=="chi2") { .print.table.statistic(gbl$var.name=gbl$chi.stat, fmt$var.name=fmt$chi.stat, part.string=part, part.number=which.part.number) }
+    else if (substr(part,1,nchar("chi2"))=="chi2") { .print.table.statistic(gbl.var.name=gbl$chi.stat, fmt.var.name=fmt$chi.stat, part.string=part, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # Wald Test
-    else if (substr(part,1,nchar("Wald"))=="Wald") { .print.table.statistic(gbl$var.name=gbl$wald.stat, fmt$var.name=fmt$wald.stat, part.string=part, part.number=which.part.number) }
+    else if (substr(part,1,nchar("Wald"))=="Wald") { .print.table.statistic(gbl.var.name=gbl$wald.stat, fmt.var.name=fmt$wald.stat, part.string=part, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # LR Test
-    else if (substr(part,1,nchar("LR"))=="LR") { .print.table.statistic(gbl$var.name=gbl$lr.stat, fmt$var.name=fmt$lr.stat, part.string=part, part.number=which.part.number) }
+    else if (substr(part,1,nchar("LR"))=="LR") { .print.table.statistic(gbl.var.name=gbl$lr.stat, fmt.var.name=fmt$lr.stat, part.string=part, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # Score (Logrank) Test
-    else if (substr(part,1,nchar("logrank"))=="logrank") { .print.table.statistic(gbl$var.name=gbl$logrank.stat, fmt$var.name=fmt$logrank.stat, part.string=part, part.number=which.part.number) }
+    else if (substr(part,1,nchar("logrank"))=="logrank") { .print.table.statistic(gbl.var.name=gbl$logrank.stat, fmt.var.name=fmt$logrank.stat, part.string=part, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # null deviance
-    else if (substr(part,1,nchar("null deviance"))=="null deviance") { .print.table.statistic(gbl$var.name=gbl$null.deviance, fmt$var.name=fmt$null.deviance, part.string=part, part.number=which.part.number) }
+    else if (substr(part,1,nchar("null deviance"))=="null deviance") { .print.table.statistic(gbl.var.name=gbl$null.deviance, fmt.var.name=fmt$null.deviance, part.string=part, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     # residual deviance
-    else if (substr(part,1,nchar("residual deviance"))=="residual deviance") { .print.table.statistic(gbl$var.name=gbl$residual.deviance, fmt$var.name=fmt$residual.deviance, part.string=part, part.number=which.part.number) }
+    else if (substr(part,1,nchar("residual deviance"))=="residual deviance") { .print.table.statistic(gbl.var.name=gbl$residual.deviance, fmt.var.name=fmt$residual.deviance, part.string=part, part.number=which.part.number, fmt=fmt, gbl=gbl) }
     
     ##
     
     # single horizontal line, no matter what
     else if (part=="-!") {
       cat("\\hline ")
-      .table.insert.space()
+      .table.insert.space(fmt)
       cat(" \n") 
       .table.part.published[which.part.number] <<- TRUE
     }
@@ -1114,7 +1119,7 @@
     else if (part=="-") {
       if (.publish.horizontal.line==TRUE) {
         cat("\\hline ")
-        .table.insert.space()
+        .table.insert.space(fmt)
         cat(" \n") 
         .table.part.published[which.part.number] <<- TRUE
       }
@@ -1124,7 +1129,7 @@
     else if (part=="=!") {
       cat("\\hline \n") 
       cat("\\hline ")
-      .table.insert.space()
+      .table.insert.space(fmt)
       cat(" \n")
       .table.part.published[which.part.number] <<- TRUE
     }
@@ -1134,7 +1139,7 @@
       if (.publish.horizontal.line==TRUE) {
         cat("\\hline \n") 
         cat("\\hline ")
-        .table.insert.space()
+        .table.insert.space(fmt)
         cat(" \n") 
         .table.part.published[which.part.number] <<- TRUE
       }
@@ -1156,40 +1161,50 @@
     
     # empty line
     else if (part==" ") {
-      .table.empty.line();
+      .table.empty.line(fmt);
       .table.part.published[which.part.number] <<- TRUE
     }
     
     # additional lines
-    else if (part=="additional") { .print.additional.lines(part.number=which.part.number) }
+    else if (part=="additional") { fmt <- .print.additional.lines(part.number=which.part.number, fmt=fmt) }
   }
 
 
 .stargazer.reg.table <-
-  function(...) {
+  function(..., fmt, gbl) {
     
     list.of.models <- as.list(list(...))
     how.many.models <- length(list.of.models)
     
     # find how many models user wants to customize
     # max.user <- max(length(coef),length(se),length(t),length(p),length(ci.custom))
-    length(coef) <<- length(se) <<- length(t) <<- length(p) <<- length(ci.custom) <<- how.many.models
+    for(x in c("coef", "se", "t", "p", "ci.custom")){
+      x <- gbl[[x]] 
+      length(x) <- how.many.models
+      gbl[x] <- list(x)
+      ## this is to not accidentally erase the list elements when they are NULL
+    }
+    # length(gbl$coef) <- length(gbl$se) <- length(gbl$t) <- length(gbl$p) <- length(gbl$ci.custom) <- how.many.models
     
     if (how.many.models >= 1) {
-      suppressMessages(.new.table(list.of.models[[1]], user.coef=coef[[1]], user.se=se[[1]], user.t=t[[1]], user.p=p[[1]], auto.t=t.auto, auto.p=p.auto, user.ci.lb=ci.custom[[1]][,1], user.ci.rb=ci.custom[[1]][,2]))
+      suppressMessages(
+        gbl <- .new.table(list.of.models[[1]], user.coef=gbl$coef[[1]], user.se=gbl$se[[1]], user.t=gbl$t[[1]], user.p=gbl$p[[1]], auto.t=gbl$t.auto, auto.p=gbl$p.auto, user.ci.lb=gbl$ci.custom[[1]][,1], user.ci.rb=gbl$ci.custom[[1]][,2], gbl = gbl)
+      )
       if (how.many.models >= 2) {
         for (i in seq(from = 2,to = how.many.models)) { 
           #if (i <= max.user) {
-          suppressMessages(.add.model(list.of.models[[i]], user.coef=coef[[i]], user.se=se[[i]], user.t=t[[i]], user.p=p[[i]], auto.t=t.auto, auto.p=p.auto, user.ci.lb=ci.custom[[i]][,1], user.ci.rb=ci.custom[[i]][,2])) 
+          suppressMessages(
+            gbl <- .add.model(list.of.models[[i]], user.coef=gbl$coef[[i]], user.se=gbl$se[[i]], user.t=gbl$t[[i]], user.p=gbl$p[[i]], auto.t=gbl$t.auto, auto.p=gbl$p.auto, user.ci.lb=gbl$ci.custom[[i]][,1], user.ci.rb=gbl$ci.custom[[i]][,2], fmt, gbl)
+            ) 
           #}
           #else {
           #  suppressMessages(.add.model(list.of.models[[i]], user.coef=NULL, user.se=NULL, user.t=NULL, user.p=NULL, auto.t=t.auto, auto.p=p.auto, user.ci.lb=NULL, user.ci.rb=NULL))
           #}
         }
       }
-      .apply(auto.t=t.auto, auto.p=p.auto)
-      .order.reg.table(order)
-      suppressMessages(.publish.table())
+      gbl <- .apply(gbl)
+      gbl <- .order.reg.table(fmt, gbl)
+      suppressMessages(.publish.table(fmt, gbl))
     }
   } 
 
@@ -1269,7 +1284,7 @@
       
       x.which <- 0
       
-      if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <<- NA }
+      if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <- NA }
       
       for (x in seq(1:length(names(object)))) {
         
@@ -1466,7 +1481,7 @@
   }
 
 .stargazer.summ.stat.table <-
-  function(object) {
+  function(object, fmt, gbl) {
     
     if (length(names(object)) < 1) {
       cat("% Error: Data frame columns do not have any names.\n")
@@ -1476,16 +1491,16 @@
     }
     else {
       
-      object <- .order.data.frame(object, order, summary=T)
+      object <- .order.data.frame(object, order, summary=T, fmt$rownames, fmt$perl)
       
-      .table.info.comment()
+      .table.info.comment(fmt, gbl)
       
       # create table header
-      .summ.stat.table.header(object)
-      .table.insert.space()
+      .summ.stat.table.header(object, fmt)
+      .table.insert.space(fmt)
       
       for (i in seq(1:length(fmt$s.stat.parts))) {
-        .summ.stat.table.part(object,fmt$s.stat.parts[i])
+        .summ.stat.table.part(object,fmt$s.stat.parts[i], fmt)
       }
       
       cat("\\end{tabular} \n")
@@ -1497,7 +1512,7 @@
   }
 
 .summ.stat.publish.statistic <-
-  function(object, which.variable, which.statistic) {
+  function(object, which.variable, which.statistic, fmt) {
     
     if ((is.numeric(object[,which.variable]) == TRUE) | ((is.logical(object[,which.variable])) & (fmt$summ.logical==TRUE)))  {
       
@@ -1512,13 +1527,13 @@
       
       which.statistic <- tolower(which.statistic)
       if (which.statistic == "n") {
-        return(.iround(sum(!is.na(temp.var)), 0))
+        return(.iround(sum(!is.na(temp.var)), 0, fmt=fmt))
       }
       else if (which.statistic == "nmiss") {
-        return(.iround(sum(is.na(temp.var)), 0))
+        return(.iround(sum(is.na(temp.var)), 0, fmt=fmt))
       }
       else if (which.statistic == "mean") {
-        return(.iround(mean(temp.var, na.rm=TRUE), fmt$s.round.digits))
+        return(.iround(mean(temp.var, na.rm=TRUE), fmt$s.round.digits, fmt=fmt))
       }
       else if (which.statistic == "median") {
         median.value <- median(temp.var, na.rm=TRUE)
@@ -1529,25 +1544,25 @@
           else { how.much.to.round <- 1 }
         }
         
-        return(.iround(median.value, how.much.to.round))
+        return(.iround(median.value, how.much.to.round, fmt=fmt))
       }
       else if (which.statistic == "sd") {
-        return(.iround(sd(temp.var, na.rm=TRUE), fmt$s.round.digits))
+        return(.iround(sd(temp.var, na.rm=TRUE), fmt$s.round.digits, fmt=fmt))
       }
       else if (which.statistic == "min") {
         if (.is.all.integers(temp.var) == FALSE) { how.much.to.round <- fmt$s.round.digits }
         else { how.much.to.round <- 0 }
         
-        return(.iround(min(temp.var, na.rm=TRUE), how.much.to.round))
+        return(.iround(min(temp.var, na.rm=TRUE), how.much.to.round, fmt=fmt))
       }
       else if (which.statistic == "max") {
         if (.is.all.integers(temp.var) == FALSE) { how.much.to.round <- fmt$s.round.digits }
         else { how.much.to.round <- 0 }
         
-        return(.iround(max(temp.var, na.rm=TRUE), how.much.to.round))
+        return(.iround(max(temp.var, na.rm=TRUE), how.much.to.round, fmt=fmt))
       }
       else if (which.statistic == "mad") {
-        return(.iround(mad(temp.var, na.rm=TRUE), fmt$s.round.digits))
+        return(.iround(mad(temp.var, na.rm=TRUE), fmt$s.round.digits, fmt=fmt))
       }
       else if (substr(which.statistic,1,1) == "p") {
         
@@ -1559,15 +1574,15 @@
           else { how.much.to.round <- 1 }
         }
         
-        return(.iround(percentile.value, how.much.to.round))
+        return(.iround(percentile.value, how.much.to.round, fmt=fmt))
       }
     }
     else { return(NA) }
   }
 
 .summ.stat.table.header <-
-  function(object) {
-    .floating.header()
+  function(object, fmt) {
+    .floating.header(fmt)
     
     #
     .formatting.alignment <- paste("@{\\extracolsep{",fmt$column.sep.width,"}}l", sep="")
@@ -1590,7 +1605,7 @@
 
 # figure out which variables are included --> returns indices of included variables
 .summ.stat.included <- 
-  function(object) {
+  function(object, fmt) {
     
     included <- NULL
     
@@ -1640,9 +1655,9 @@
   }
 
 .summ.stat.table.part <-
-  function(object, part) {
+  function(object, part, fmt) {
     
-    included <- .summ.stat.included(object)
+    included <- .summ.stat.included(object, fmt)
     
     # with summary statistics, always publish horizontal line
     .publish.horizontal.line <<- TRUE
@@ -1666,7 +1681,7 @@
       }
       else {   # flipped summary statistic table
         
-        if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <<- NA }
+        if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <- NA }
         
         i.label <- 0
         
@@ -1691,7 +1706,7 @@
     }
     
     if (substr(part,1,10)=="statistics") {
-      if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <<- NA }
+      if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <- NA }
       
       
       if (fmt$flip == FALSE) {
@@ -1714,14 +1729,14 @@
               
               # if aligning decimal marks, need to use multicolumn for anything w/o decimal mark
               if (fmt$dec.mark.align == FALSE) {   # not aligning
-                cat(" & ", .summ.stat.publish.statistic(object, i, fmt$s.statistics.list[j]), sep="")  
+                cat(" & ", .summ.stat.publish.statistic(object, i, fmt$s.statistics.list[j], fmt), sep="")  
               }
               else {     # aligning
-                if (.is.all.integers(.summ.stat.publish.statistic(object, i, fmt$s.statistics.list[j]))) {
-                  cat(" & \\multicolumn{1}{c}{", .summ.stat.publish.statistic(object, i, fmt$s.statistics.list[j]),"}", sep="")
+                if (.is.all.integers(.summ.stat.publish.statistic(object, i, fmt$s.statistics.list[j], fmt))) {
+                  cat(" & \\multicolumn{1}{c}{", .summ.stat.publish.statistic(object, i, fmt$s.statistics.list[j], fmt),"}", sep="")
                 }
                 else {
-                  cat(" & ", .summ.stat.publish.statistic(object, i, fmt$s.statistics.list[j]), sep="")
+                  cat(" & ", .summ.stat.publish.statistic(object, i, fmt$s.statistics.list[j], fmt), sep="")
                 }
               }	    
             }
@@ -1750,14 +1765,14 @@
             for (j in included) {
               # if aligning decimal marks, need to use multicolumn for anything w/o decimal mark
               if (fmt$dec.mark.align == FALSE) {   # not aligning
-                cat(" & ", .summ.stat.publish.statistic(object, j, fmt$s.statistics.list[i]), sep="")  
+                cat(" & ", .summ.stat.publish.statistic(object, j, fmt$s.statistics.list[i], fmt), sep="")  
               }
               else {     # aligning
-                if (.is.all.integers(.summ.stat.publish.statistic(object, j, fmt$s.statistics.list[i]))) {
-                  cat(" & \\multicolumn{1}{c}{", .summ.stat.publish.statistic(object, j, fmt$s.statistics.list[i]),"}", sep="")
+                if (.is.all.integers(.summ.stat.publish.statistic(object, j, fmt$s.statistics.list[i], fmt))) {
+                  cat(" & \\multicolumn{1}{c}{", .summ.stat.publish.statistic(object, j, fmt$s.statistics.list[i], fmt),"}", sep="")
                 }
                 else {
-                  cat(" & ", .summ.stat.publish.statistic(object, j, fmt$s.statistics.list[i]), sep="")
+                  cat(" & ", .summ.stat.publish.statistic(object, j, fmt$s.statistics.list[i], fmt), sep="")
                 }
               } 
             }
@@ -1793,20 +1808,20 @@
     
     # empty line
     else if (part==" ") {
-      .table.empty.line()
+      .table.empty.line(fmt, gbl)
     }
     
     # horizontal line
     else if (part=="-!") {
       cat("\\hline ")
-      .table.insert.space()
+      .table.insert.space(fmt)
       cat(" \n")
     }
     
     else if (part=="-") {
       if (.publish.horizontal.line==TRUE) {
         cat("\\hline ")
-        .table.insert.space()
+        .table.insert.space(fmt)
         cat(" \n")
       }
     }
@@ -1815,7 +1830,7 @@
     else if (part=="=!") {
       cat("\\hline \n") 
       cat("\\hline ")
-      .table.insert.space()
+      .table.insert.space(fmt)
       cat(" \n")
     }
     
@@ -1823,7 +1838,7 @@
       if (.publish.horizontal.line==TRUE) {
         cat("\\hline \n") 
         cat("\\hline ")
-        .table.insert.space()
+        .table.insert.space(fmt)
         cat(" \n")
       }
     }
