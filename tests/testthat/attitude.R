@@ -7,8 +7,16 @@ test_that("attitude data frame", {
   
   
   expect_output_file(
-    shoegazer::stargazer(attitude),
-    file = "tests/testthat/attitude.df.out"
+    stargazer(attitude),
+    file = "tests/testthat/attitude.df.tex"
+  #  ,update=TRUE
+  )  
+
+  expect_output_file(
+    stargazer(attitude, type = "html"),
+    file = "tests/testthat/attitude.df.html"
+  #  ,update=TRUE
   )  
   
+    
 })

@@ -882,7 +882,12 @@ stargazer <-
     if (!is.null(digit.separate)) { 
       if (digit.separate=="lakh") { fmt$digit.separator.where <- c(3,2) }  # lakhs 
       else if ((digit.separate=="china") | (digit.separate=="japan")) { fmt$digit.separator.where <- 4 }
-      else { fmt$digit.separator.where <- digit.separate}
+      else { 
+        ## first deal with digit separator
+        
+        fmt$digit.separator.where <- digit.separate
+        fmt$digit.separator.where[fmt$digit.separator.where <= 0] <- -1
+      }
     }
     
     if (!is.null(digits)) { 
