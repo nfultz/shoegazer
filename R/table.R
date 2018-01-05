@@ -1202,7 +1202,7 @@
           #}
         }
       }
-      gbl <- .apply(gbl)
+      gbl <- .apply(gbl, gbl$t.auto, gbl$p.auto)
       gbl <- .order.reg.table(fmt, gbl)
       suppressMessages(.publish.table(fmt, gbl))
     }

@@ -308,14 +308,14 @@ is.wholenumber <-
 
 
 .apply <-
-  function(gbl)
+  function(gbl, auto.t, auto.p)
   {
     if ((!is.null(gbl$apply.coef)) | ((!is.null(gbl$apply.se)))) {
-      if (!is.null(gbl$apply.coef)) { gbl$coefficients <- apply(gbl$coefficients, c(1,2), apply.coef) }
-      if (!is.null(gbl$apply.se)) { gbl$std.errors <- apply(gbl$std.errors, c(1,2), apply.se) }
+      if (!is.null(gbl$apply.coef)) { gbl$coefficients <- apply(gbl$coefficients, c(1,2), gbl$apply.coef) }
+      if (!is.null(gbl$apply.se)) { gbl$std.errors <- apply(gbl$std.errors, c(1,2), gbl$apply.se) }
       
-      if (gbl$auto.t == TRUE) { gbl$t.stats <- gbl$coefficients / gbl$std.errors }
-      if (gbl$auto.p == TRUE) { gbl$p.values <- 2 * pnorm( abs( gbl$t.stats ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) }
+      if (auto.t == TRUE) { gbl$t.stats <- gbl$coefficients / gbl$std.errors }
+      if (auto.p == TRUE) { gbl$p.values <- 2 * pnorm( abs( gbl$t.stats ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) }
       
     }
     
