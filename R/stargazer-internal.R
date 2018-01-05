@@ -1171,7 +1171,9 @@ stargazer <-
           )
       }
       else if ((type == "text") | (type == "html") | (type == "mmd")) {
-        latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, c(fmt=fmt, gbl=gbl, as.list(objects[regression.table.objects]))),file=NULL)) )
+        latex.code <- c(latex.code, invisible(capture.output(
+          do.call(.stargazer.reg.table, c(fmt=list(fmt), gbl=list(gbl), as.list(objects[regression.table.objects])))
+          ,file=NULL)) )
       }
     }
     
