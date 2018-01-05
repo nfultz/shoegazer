@@ -100,13 +100,7 @@
     round.result.char <- as.character(format(round.result, scientific=FALSE))
     split.round.result <- unlist(strsplit(round.result.char, "\\."))
     
-    ## first deal with digit separator
-    
-    for (i in seq(from=1, to=length(fmt$digit.separator.where))) {
-      if (fmt$digit.separator.where[i]<=0) {
-        fmt$digit.separator.where[i] <<- -1
-      }
-    }
+
     
     separator.count <- 1
     length.integer.part <- nchar(split.round.result[1])

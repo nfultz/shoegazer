@@ -211,7 +211,7 @@
     cat("\n")
     if (fmt$header==TRUE) {
       cat("% Table created by ", gbl$package.name, " v.", gbl$package.version, " by ", gbl$package.author.name, ", ", gbl$package.author.affiliation, ". E-mail: ", gbl$package.author.email, "\n", sep="")  
-      cat("% Date and time:", format(Sys.time(), "%a, %b %d, %Y - %X"))
+      cat("% Date and time:", format(getOption("shoegazer.test", Sys.time()), "%a, %b %d, %Y - %X"))
       cat("\n")
       
       required.latex.packages <- NULL
