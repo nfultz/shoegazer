@@ -111,7 +111,7 @@
   }
 
 .get.coefficients.1 <-
-  function(object.name, user.given=NULL, model.num=1) {
+  function(object.name, user.given=NULL, model.num=1, .summary.object) {
     
     if (!is.null(user.given)) { 
       
@@ -249,10 +249,10 @@
   }
 
 .get.coefficients <-
-  function(object.name, user.given=NULL, model.num=1) {
-    out <- .get.coefficients.1(object.name, user.given, model.num)
+  function(object.name, user.given=NULL, model.num=1, .summary.object) {
+    out <- .get.coefficients.1(object.name, user.given, model.num, .summary.object)
     
-    coef.vars <- .coefficient.variables(object.name)
+    coef.vars <- .coefficient.variables(object.name, .summary.object)
     
     if (is.null(names(out))) {  
       
@@ -978,7 +978,7 @@
   }
 
 .get.standard.errors.1 <-
-  function(object.name, user.given=NULL, model.num=1) {
+  function(object.name, user.given=NULL, model.num=1, .summary.object) {
     
     if (!is.null(user.given)) { 
       if (.model.identify(object.name) == "multinom") {
@@ -1126,8 +1126,8 @@
   }
 
 .get.standard.errors <-
-  function(object.name, user.given=NULL, model.num=1) {
-    out <- .get.standard.errors.1(object.name, user.given, model.num)
+  function(object.name, user.given=NULL, model.num=1, .summary.object) {
+    out <- .get.standard.errors.1(object.name, user.given, model.num, .summary.object)
     
     coef.vars <- .coefficient.variables(object.name)
     if (is.null(names(out))) {  
@@ -1506,7 +1506,7 @@
 
 
 .coefficient.table.part <-
-  function(part, which.variable, variable.name=NULL) {
+  function(part, which.variable, variable.name=NULL, fmt, gbl) {
     
     # coefficient variable name
     if (part=="variable name") {
@@ -1525,12 +1525,12 @@
         if (!is.na(gbl$coefficients[gbl$coefficient.variables[which.variable],i])) {
           
           # report the coefficient
-          cat(" & ", .iround(gbl$coefficients[gbl$coefficient.variables[which.variable],i],fmt$round.digits),sep="")
+          cat(" & ", .iround(gbl$coefficients[gbl$coefficient.variables[which.variable],i],fmt$round.digits, fmt=fmt),sep="")
           
           # add stars to denote statistical significance
           if (part=="coefficient*") { 
             p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
-            .enter.significance.stars(p.value) 
+            .enter.significance.stars(p.value, fmt=fmt) 
           }
           
         }
@@ -1596,17 +1596,23 @@
                 hyphen <- fmt$ci.separator
               }
               
-              cat(space.char, fmt$std.errors.left, .iround(ci.lower.bound,fmt$round.digits),hyphen,.iround(ci.upper.bound,fmt$round.digits),fmt$std.errors.right,sep="")              
+              cat(space.char, 
+                  fmt$std.errors.left, 
+                  .iround(ci.lower.bound,fmt$round.digits, fmt=fmt), 
+                  hyphen,
+                  .iround(ci.upper.bound,fmt$round.digits, fmt=fmt),
+                  fmt$std.errors.right,sep="")              
               
             }
             else { 
-              cat(space.char, fmt$std.errors.left, .iround(gbl$std.errors[gbl$coefficient.variables[which.variable],i],fmt$round.digits),fmt$std.errors.right,sep="")
+              cat(space.char, fmt$std.errors.left, 
+                  .iround(gbl$std.errors[gbl$coefficient.variables[which.variable],i],fmt$round.digits, fmt=fmt),fmt$std.errors.right,sep="")
             }
             
             # add stars to denote statistical significance
             if ("standard error*" %in% fmt$coefficient.table.parts) { 
               p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
-              .enter.significance.stars(p.value) 
+              .enter.significance.stars(p.value, fmt=fmt) 
             }
             
           }
@@ -1669,22 +1675,22 @@
             }
             
             if (fmt$dec.mark.align == TRUE) {
-              cat(" & \\multicolumn{1}{c}{", fmt$std.errors.left, .iround(ci.lower.bound,fmt$round.digits),hyphen,.iround(ci.upper.bound,fmt$round.digits),fmt$std.errors.right,"}",sep="")
+              cat(" & \\multicolumn{1}{c}{", fmt$std.errors.left, .iround(ci.lower.bound,fmt$round.digits, fmt=fmt),hyphen,.iround(ci.upper.bound,fmt$round.digits, fmt=fmt),fmt$std.errors.right,"}",sep="")
             }
             else {
-              cat(" & ", fmt$std.errors.left, .iround(ci.lower.bound,fmt$round.digits),hyphen,.iround(ci.upper.bound,fmt$round.digits),fmt$std.errors.right,sep="")              
+              cat(" & ", fmt$std.errors.left, .iround(ci.lower.bound,fmt$round.digits, fmt=fmt),hyphen,.iround(ci.upper.bound,fmt$round.digits, fmt=fmt),fmt$std.errors.right,sep="")              
             }
             
             
           }
           else { 
-            cat(" & ", fmt$std.errors.left, .iround(gbl$std.errors[gbl$coefficient.variables[which.variable],i],fmt$round.digits),fmt$std.errors.right,sep="")
+            cat(" & ", fmt$std.errors.left, .iround(gbl$std.errors[gbl$coefficient.variables[which.variable],i],fmt$round.digits, fmt=fmt),fmt$std.errors.right,sep="")
           }
           
           # add stars to denote statistical significance
           if (part=="standard error*") { 
             p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
-            .enter.significance.stars(p.value) 
+            .enter.significance.stars(p.value, fmt=fmt) 
           }
           
         }
@@ -1702,12 +1708,12 @@
         if (!is.na(gbl$p.values[gbl$coefficient.variables[which.variable],i])) {
           
           # report p-values
-          cat(" & ", fmt$p.values.left, .iround(gbl$p.values[gbl$coefficient.variables[which.variable],i],fmt$round.digits,round.up.positive=TRUE),fmt$p.values.right,sep="")
+          cat(" & ", fmt$p.values.left, .iround(gbl$p.values[gbl$coefficient.variables[which.variable],i],fmt$round.digits,round.up.positive=TRUE, fmt=fmt),fmt$p.values.right,sep="")
           
           # add stars to denote statistical significance
           if (part=="p-value*") { 
             p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
-            .enter.significance.stars(p.value) 
+            .enter.significance.stars(p.value, fmt=fmt) 
           }
           
         }
@@ -1723,12 +1729,12 @@
       for (i in seq(1:length(gbl$models))) {
         if (!is.na(gbl$t.stats[gbl$coefficient.variables[which.variable],i])) {
           # report t-statistics
-          cat(" & ", fmt$t.stats.left, .iround(gbl$t.stats[gbl$coefficient.variables[which.variable],i],fmt$round.digits),fmt$t.stats.right,sep="")
+          cat(" & ", fmt$t.stats.left, .iround(gbl$t.stats[gbl$coefficient.variables[which.variable],i],fmt$round.digits, fmt=fmt),fmt$t.stats.right,sep="")
           
           # add stars to denote statistical significance
           if (part=="t-stat*") { 
             p.value <- gbl$p.values[gbl$coefficient.variables[which.variable],i]
-            .enter.significance.stars(p.value) 
+            .enter.significance.stars(p.value, fmt=fmt) 
           }
           
         }
@@ -1742,13 +1748,13 @@
     
     # empty line
     else if (part==" ") {
-      .table.empty.line()
+      .table.empty.line(fmt=fmt, gbl=gbl)
     }
     
     # horizontal line
     else if (part=="-") {
       cat("\\hline ")
-      .table.insert.space()
+      .table.insert.space(fmt=fmt)
       cat(" \n")
     }
     
@@ -1756,14 +1762,14 @@
     else if (part=="=") {
       cat("\\hline \n") 
       cat("\\hline ")
-      .table.insert.space()
+      .table.insert.space(fmt=fmt)
       cat(" \n")
     }
     
   }
 
 .coefficient.variables <-
-  function(object.name) {
+  function(object.name, .summary.object) {
     
     model.name <- .get.model.name(object.name)
     
@@ -1862,7 +1868,7 @@
   }
 
 .dependent.variable <-
-  function(object.name, model.num=1) {
+  function(object.name, model.num=1, .summary.object) {
     
     model.name <- .get.model.name(object.name)
     if (model.name %in% c("lmer", "glmer", "nlmer", "gls")) {

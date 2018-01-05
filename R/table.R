@@ -2,19 +2,8 @@
 .new.table <-
   function(object.name, user.coef=NULL, user.se=NULL, user.t=NULL, user.p=NULL, auto.t=TRUE, auto.p=TRUE, user.ci.lb=NULL, user.ci.rb=NULL, gbl) {
     
-    if (class(object.name)[1] == "Glm") {
-      .summary.object <<- summary.glm(object.name)
-    }
-    else if (!(.model.identify(object.name) %in% c("aftreg", "coxreg","phreg","weibreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq"))) {
-      .summary.object <<- summary(object.name)
-    }
-    else {
-      .summary.object <<- object.name
-    }
     
-    if (.model.identify(object.name) == "rq") {
-      .summary.object <<- suppressMessages(summary(object.name, se=fmt$rq.se))
-    }
+    .summary.object <- .get.summary.object(object.name)
     
     model.num.total <- 1   # model number for multinom, etc.
     if (.model.identify(object.name) == "multinom") {
@@ -73,8 +62,8 @@
       
       gbl$coef.vars.by.model <-  suppressMessages(cbind(gbl$coef.vars.by.model, gbl$coefficient.variables))
       
-      get.coef <- suppressMessages(.get.coefficients(object.name, user.coef, model.num=model.num))
-      get.se <- suppressMessages(.get.standard.errors(object.name, user.se, model.num=model.num))
+      get.coef <- suppressMessages(.get.coefficients(object.name, user.coef, model.num=model.num, .summary.object))
+      get.se <- suppressMessages(.get.standard.errors(object.name, user.se, model.num=model.num, .summary.object))
       
       gbl$coefficients <- cbind(gbl$coefficients, get.coef)
       gbl$std.errors <- cbind(gbl$std.errors, get.se)
@@ -133,7 +122,7 @@
   }
 
 .table.enter.coefficients <-
-  function(which.variable) {
+  function(which.variable, fmt, gbl) {
     
     if (which.variable > length(gbl$coefficients)) {
       return();
@@ -172,7 +161,7 @@
     
     if (omitted == FALSE) {
       
-      .which.variable.label <<- .which.variable.label + 1
+      .which.variable.label <- .which.variable.label + 1
       
       # remove final -TRUE (added by Zelig) from dummy variables
       if (substr(local.coefficient.var.name, nchar(local.coefficient.var.name)-3, nchar(local.coefficient.var.name)) == "TRUE") {
@@ -192,7 +181,7 @@
       
       if (length(fmt$coefficient.table.parts)>=1) {
         for (i in seq(1:length(fmt$coefficient.table.parts))) {
-          .coefficient.table.part(part=fmt$coefficient.table.parts[i], which.variable, variable.name=local.coefficient.var.name)
+          .coefficient.table.part(part=fmt$coefficient.table.parts[i], which.variable, variable.name=local.coefficient.var.name, fmt=fmt, gbl=gbl)
         }
       }
     }
@@ -999,12 +988,12 @@
     
     ## coefficients
     else if (part=="coefficients") { 		
-      .which.variable.label <<- 0
+      .which.variable.label <- 0
       if (is.null(fmt$covariate.labels)) { fmt$covariate.labels <- NA }
       
       # then, enter the coefficients
       
-      for (i in seq(1:length(gbl$coefficient.variables))) { .table.enter.coefficients(i) }
+      for (i in seq(1:length(gbl$coefficient.variables))) { .table.enter.coefficients(i, fmt, gbl) }
       
       .table.part.published[which.part.number] <<- TRUE
     }

@@ -1,19 +1,25 @@
+.get.summary.object <- function(object.name) {
+  if (class(object.name)[1] == "Glm") {
+    .summary.object<- summary.glm(object.name)
+  }
+  else if (!(.model.identify(object.name) %in% c("aftreg", "coxreg","phreg","weibreg", "Glm", "bj", "cph", "lrm", "ols", "psm", "Rq"))) {
+    .summary.object<- summary(object.name)
+  }
+  else {
+    .summary.object<- object.name
+  }
+  
+  if (.model.identify(object.name) == "rq") {
+    .summary.object<- suppressMessages(summary(object.name, se=fmt$rq.se))
+  }
+  
+  .summary.object
+}
+
 .add.model <-
   function(object.name, user.coef=NULL, user.se=NULL, user.t=NULL, user.p=NULL, auto.t=TRUE, auto.p=TRUE, user.ci.lb=NULL, user.ci.rb=NULL, fmt, gbl) {
     
-    if (class(object.name)[1] == "Glm") {
-      .summary.object<- summary.glm(object.name)
-    }
-    else if (!(.model.identify(object.name) %in% c("aftreg", "coxreg","phreg","weibreg", "Glm", "bj", "cph", "lrm", "ols", "psm", "Rq"))) {
-      .summary.object<- summary(object.name)
-    }
-    else {
-      .summary.object<- object.name
-    }
-    
-    if (.model.identify(object.name) == "rq") {
-      .summary.object<- suppressMessages(summary(object.name, se=fmt$rq.se))
-    }
+    .summary.object <- .get.summary.object(object.name)
     
     model.num.total <- 1   # model number for multinom, etc.
     if (.model.identify(object.name) == "multinom") {
@@ -160,12 +166,12 @@
         
         feed.coef <- NA; feed.se <- NA
         # coefficients and standard errors
-        if (!is.null(.get.coefficients(object.name, user.coef, model.num=model.num)[row])) { 
-          temp.coefficients[row, ncol(temp.coefficients)] <- .get.coefficients(object.name, user.coef, model.num=model.num)[row] 
+        if (!is.null(.get.coefficients(object.name, user.coef, model.num=model.num, .summary.object)[row])) { 
+          temp.coefficients[row, ncol(temp.coefficients)] <- .get.coefficients(object.name, user.coef, model.num=model.num, .summary.object)[row] 
           feed.coef <- temp.coefficients[, ncol(temp.coefficients)]
         }
-        if (!is.null(.get.standard.errors(object.name, user.se, model.num=model.num)[row])) { 
-          temp.std.errors[row, ncol(temp.std.errors)] <- .get.standard.errors(object.name, user.se, model.num=model.num)[row] 
+        if (!is.null(.get.standard.errors(object.name, user.se, model.num=model.num, .summary.object)[row])) { 
+          temp.std.errors[row, ncol(temp.std.errors)] <- .get.standard.errors(object.name, user.se, model.num=model.num, .summary.object)[row] 
           feed.se <- temp.std.errors[, ncol(temp.std.errors)]
         }
         
